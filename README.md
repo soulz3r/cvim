@@ -2,7 +2,7 @@
 # CVIM
 
 <p align="center">
-[cvim_intro.webm](https://github.com/user-attachments/assets/dbed007c-070e-4e26-bb39-83793c824f62)
+https://github.com/user-attachments/assets/dbed007c-070e-4e26-bb39-83793c824f62
     <h1>Watch the CVIM introduction video</h1>
 </p>
 
