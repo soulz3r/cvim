@@ -1,10 +1,9 @@
+
 # CVIM
 
 <p align="center">
-  <video src="https://raw.githubusercontent.com/soulz3r/cvim/beta/docs/assets/cvim_intro.webm" controls muted playsinline loop width="100%">
-    Your browser does not support embedded video.
-    <a href="https://raw.githubusercontent.com/soulz3r/cvim/beta/docs/assets/cvim_intro.webm">Watch the CVIM introduction video</a>.
-  </video>
+[cvim_intro.webm](https://github.com/user-attachments/assets/dbed007c-070e-4e26-bb39-83793c824f62)
+    <h1>Watch the CVIM introduction video</h1>
 </p>
 
 <p align="center">
