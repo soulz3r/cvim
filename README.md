@@ -8,7 +8,6 @@ https://github.com/user-attachments/assets/dbed007c-070e-4e26-bb39-83793c824f62
   <strong>C, with a better editor.</strong>
 </p>
 
-
 CVIM is a C-focused Neovim environment built around a fast terminal workflow, native Neovim tooling, project-aware development, and a deliberately customized interface. It runs across Windows 11, WSL, and Linux, including Arch Linux and Hyprland.
 
 The configuration uses Lazy.nvim, native Neovim LSP, Blink.cmp, Telescope, Mini Files, Treesitter, custom LLDB debugging, and an Everforest-oriented UI.
