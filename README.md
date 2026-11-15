@@ -1,10 +1,7 @@
 
 # CVIM
 
-<p align="center">
 https://github.com/user-attachments/assets/dbed007c-070e-4e26-bb39-83793c824f62
-    <h1>Watch the CVIM introduction video</h1>
-</p>
 
 <p align="center">
   A personal Neovim configuration for Windows, WSL, and Linux.
