@@ -168,7 +168,7 @@ function M.build(dashboard, code_examples)
 			ranges[1] = { { "Normal", 0, 0 } }
 		end
 
-		local animated_ranges = tutorial.build_animation_highlights(frame, start_line)
+		local animated_ranges = tutorial.build_animation_highlights(frame, start_line, frame.topic)
 
 		-- Animated ranges already use byte offsets, matching Alpha's API.
 		for line_number, line_ranges in pairs(animated_ranges) do
