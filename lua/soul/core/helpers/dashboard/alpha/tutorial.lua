@@ -5,9 +5,13 @@ local horizontal_rule = require("soul.core.helpers.dashboard.horizontal_rule").b
 local function build_animation_timeline(animation, content_width)
 	local timeline = {}
 	local hold_ticks = math.max(0, animation.hold_ticks or 0)
+	local current_topic
 
 	local function push(lines)
 		local frame = vim.deepcopy(lines)
+		-- Carry the complete scene title with every partial frame. Highlighting
+		-- must not guess a topic from an ambiguous typewriter prefix.
+		frame.topic = current_topic
 
 		-- Keep every animated row at the logo's fixed width. Alpha can then
 		-- center the whole block without recentering short partial lines.
@@ -22,6 +26,8 @@ local function build_animation_timeline(animation, content_width)
 	end
 
 	for _, scene in ipairs(animation.scenes) do
+		current_topic = (scene.lines[1] or ""):match("^%s*(.-)%s*$")
+
 		-- Every scene uses the same seven-row layout:
 		-- heading, two code lines, caret, optional closing line,
 		-- separator, explanation.
@@ -543,31 +549,11 @@ local function highlight_message(ranges, line_number, line)
 	end
 end
 
-local function highlight_animation_line(ranges, line_number, line, line_index)
-	local heading = line:match("^%s*(.-)%s*$")
-	local topic_group = topic_highlights[heading]
-
-	-- A partial heading can match several topics. Only apply a color while
-	-- every matching topic agrees, avoiding arbitrary color changes from pairs().
-	if not topic_group and #heading > 0 and heading:match("^[A-Z ]+$") then
-		local candidate_group
-		local ambiguous = false
-
-		for title, group in pairs(topic_highlights) do
-			if title:sub(1, #heading) == heading then
-				if candidate_group and candidate_group ~= group then
-					ambiguous = true
-					break
-				end
-				candidate_group = group
-			end
-		end
-
-		if not ambiguous then
-			topic_group = candidate_group
-		end
-	end
-
+local function highlight_animation_line(ranges, line_number, line, line_index, topic)
+	-- The full scene title is known even while the typewriter has emitted only
+	-- a prefix. Use that metadata so every visible character has one stable
+	-- difficulty color from the first frame onward.
+	local topic_group = line_index == 1 and topic_highlights[topic] or nil
 	if topic_group then
 		add_range(ranges, topic_group, line_number, 0, #line)
 		return
@@ -632,11 +618,11 @@ local function highlight_animation_line(ranges, line_number, line, line_index)
 	end
 end
 
-local function build_animation_highlights(lines, start_line)
+local function build_animation_highlights(lines, start_line, topic)
 	local ranges = {}
 	for index, line in ipairs(lines) do
 		local line_number = start_line + index - 1
-		highlight_animation_line(ranges, line_number, line, index)
+		highlight_animation_line(ranges, line_number, line, index, topic)
 		normalize_line_ranges(ranges, line_number, line)
 	end
 	return ranges
