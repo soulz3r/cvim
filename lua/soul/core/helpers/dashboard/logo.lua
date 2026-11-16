@@ -206,8 +206,20 @@ local function build_c_frame(frame)
 			local shade = math.min(1, 0.14 + diffuse * 0.72 + specular * 0.42)
 			local glyph_index = math.floor(shade * (#glyphs - 1)) + 1
 
+			-- Lighting follows the world as the C rotates, but the material
+			-- color belongs to the surface itself. Using the rotated normal
+			-- here made color bands slide across the logo and flicker at cell
+			-- boundaries. Keep the color classification in object space so
+			-- each surface patch retains its color throughout the rotation.
+			local material_light = math.max(
+				0,
+				sample.normal_x * LIGHT_X + sample.normal_y * LIGHT_Y + sample.normal_z * LIGHT_Z
+			)
+
 			pixels[row][column] = glyphs[glyph_index]
-			groups[row][column] = shade > 0.82 and "AlphaAqua" or shade > 0.48 and "AlphaTeal" or "AlphaGreen"
+			groups[row][column] = material_light > 0.82 and "AlphaAqua"
+				or material_light > 0.48 and "AlphaTeal"
+				or "AlphaGreen"
 		end
 	end
 
