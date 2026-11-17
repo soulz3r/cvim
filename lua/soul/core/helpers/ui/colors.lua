@@ -107,6 +107,18 @@ local highlights = {
 	AlphaPurple = { fg = P.purple },
 	AlphaOrange = { fg = P.orange },
 
+	-- Quantized shades for the rotating C. These form one continuous
+	-- Everforest-inspired material gradient from shadow to mint highlight.
+	AlphaCShade1 = { fg = "#526B62" },
+	AlphaCShade2 = { fg = "#607B6B" },
+	AlphaCShade3 = { fg = "#708D74" },
+	AlphaCShade4 = { fg = "#829F7D" },
+	AlphaCShade5 = { fg = "#A7C080" },
+	AlphaCShade6 = { fg = "#B2CA8B" },
+	AlphaCShade7 = { fg = "#AFCF98" },
+	AlphaCShade8 = { fg = "#A7D3A7" },
+	AlphaCShade9 = { fg = "#9AD8B2" },
+
 	-- Alpha dashboard topics: colors progress from easy to difficult.
 	AlphaTopicCompilation = { fg = P.green, bold = true },
 	AlphaTopicRepresentations = { fg = P.aqua, bold = true },
