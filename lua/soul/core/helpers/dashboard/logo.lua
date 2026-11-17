@@ -94,8 +94,8 @@ for row, line in ipairs(WORDMARK) do
 	WORDMARK_CHARS[row] = split_chars(line)
 end
 
--- Three broad material bands run along the C's stroke. Their boundaries
--- are fixed in object space, so rotation cannot make the palette drift.
+-- Three material bands wrap around the tube cross-section. Each band spans
+-- the full C stroke, keeping the palette consistent from end to end.
 local MATERIAL_GROUPS = { "AlphaGreen", "AlphaTeal", "AlphaAqua" }
 
 -- The surface never changes. Build its trigonometric coordinates only
@@ -115,10 +115,10 @@ local function get_surface_samples()
 		local theta = math.rad(48 + theta_step * (264 / 144))
 		local theta_cos = math.cos(theta)
 		local theta_sin = math.sin(theta)
-		local material_group = MATERIAL_GROUPS[math.floor(theta_step * #MATERIAL_GROUPS / 145) + 1]
 
 		for phi_step = 0, 63 do
 			local phi = phi_step * (2 * math.pi / 64)
+			local material_group = MATERIAL_GROUPS[math.floor(phi_step * #MATERIAL_GROUPS / 64) + 1]
 			local phi_cos = math.cos(phi)
 			local phi_sin = math.sin(phi)
 			local radius = 1 + 0.23 * phi_cos
