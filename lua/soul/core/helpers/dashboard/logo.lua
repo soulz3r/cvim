@@ -139,12 +139,6 @@ local function get_surface_samples()
 	return SURFACE_SAMPLES
 end
 
-local LIGHT_X, LIGHT_Y, LIGHT_Z = -0.35, 0.55, 0.76
-local LIGHT_LENGTH = math.sqrt(LIGHT_X ^ 2 + LIGHT_Y ^ 2 + LIGHT_Z ^ 2)
-LIGHT_X = LIGHT_X / LIGHT_LENGTH
-LIGHT_Y = LIGHT_Y / LIGHT_LENGTH
-LIGHT_Z = LIGHT_Z / LIGHT_LENGTH
-
 local function create_grid(width, height, value)
 	local grid = {}
 	for y = 1, height do
