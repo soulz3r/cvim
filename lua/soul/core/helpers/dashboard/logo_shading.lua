@@ -24,8 +24,7 @@ local SPECULAR_POWER = 18
 
 function M.level(normal_x, normal_y, normal_z)
 	local diffuse = math.max(0, normal_x * LIGHT_X + normal_y * LIGHT_Y + normal_z * LIGHT_Z)
-	local specular = math.max(0, normal_x * HALF_X + normal_y * HALF_Y + normal_z * HALF_Z)
-		^ SPECULAR_POWER
+	local specular = math.max(0, normal_x * HALF_X + normal_y * HALF_Y + normal_z * HALF_Z) ^ SPECULAR_POWER
 
 	local intensity = math.min(1, AMBIENT + diffuse * DIFFUSE_STRENGTH + specular * SPECULAR_STRENGTH)
 	return math.floor(intensity * (M.LEVELS - 1) + 0.5) + 1
