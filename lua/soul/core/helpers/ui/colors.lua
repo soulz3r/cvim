@@ -107,21 +107,23 @@ local highlights = {
 	AlphaPurple = { fg = P.purple },
 	AlphaOrange = { fg = P.orange },
 
-	-- A single-hue Everforest green ramp for the rotating C.
-	-- Each step increases in luminance; hue stays stable from shadow to light.
-	AlphaCShade1 = { fg = "#3F594D" },
-	AlphaCShade2 = { fg = "#496552" },
-	AlphaCShade3 = { fg = "#547257" },
-	AlphaCShade4 = { fg = "#607F5E" },
-	AlphaCShade5 = { fg = "#6D8C65" },
-	AlphaCShade6 = { fg = "#7B996D" },
-	AlphaCShade7 = { fg = "#8AA776" },
-	AlphaCShade8 = { fg = "#99B47F" },
-	AlphaCShade9 = { fg = "#A7C080" },
-	AlphaCShade10 = { fg = "#B3CA8D" },
-	AlphaCShade11 = { fg = "#BED39B" },
-	AlphaCShade12 = { fg = "#C9DCAA" },
-	AlphaCShade13 = { fg = "#D5E5BA" },
+	-- A restrained Everforest ramp: cool forest shadows, moss-green body,
+	-- and a soft sage highlight. The luminance rises steadily at every step.
+	AlphaCShade1 = { fg = "#4B6255" },
+	AlphaCShade2 = { fg = "#506D59" },
+	AlphaCShade3 = { fg = "#54785C" },
+	AlphaCShade4 = { fg = "#58835D" },
+	AlphaCShade5 = { fg = "#5C8F5C" },
+	AlphaCShade6 = { fg = "#669B5F" },
+	AlphaCShade7 = { fg = "#73A565" },
+	AlphaCShade8 = { fg = "#82AD6C" },
+	AlphaCShade9 = { fg = "#91B574" },
+	AlphaCShade10 = { fg = "#9FBC7C" },
+	AlphaCShade11 = { fg = "#ACC385" },
+	AlphaCShade12 = { fg = "#B5CB8F" },
+	AlphaCShade13 = { fg = "#BFD19A" },
+	AlphaCShade14 = { fg = "#C8D8A5" },
+	AlphaCShade15 = { fg = "#D1DEB0" },
 
 	-- Alpha dashboard topics: colors progress from easy to difficult.
 	AlphaTopicCompilation = { fg = P.green, bold = true },

@@ -1,6 +1,6 @@
 local M = {}
 
-M.LEVELS = 13
+M.LEVELS = 15
 
 -- A broad, camera-facing light keeps the C readable throughout its rotation.
 -- The direction is fixed in view space; surface normals rotate into that space.
@@ -11,8 +11,8 @@ LIGHT_Y = LIGHT_Y / LIGHT_LENGTH
 LIGHT_Z = LIGHT_Z / LIGHT_LENGTH
 
 -- A small wrap term softens the terminator without flattening the shadows.
-local WRAP = 0.18
-local GAMMA = 0.82
+local WRAP = 0.22
+local GAMMA = 0.90
 
 function M.shade(normal_x, normal_y, normal_z)
 	local diffuse = normal_x * LIGHT_X + normal_y * LIGHT_Y + normal_z * LIGHT_Z
