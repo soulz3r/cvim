@@ -185,6 +185,7 @@ local function build_c_frame(frame)
 	local sine = math.sin(rotation)
 	local depth = create_grid(C_WIDTH, C_HEIGHT, -math.huge)
 	local pixels = create_grid(C_WIDTH, C_HEIGHT, " ")
+	local groups = create_grid(C_WIDTH, C_HEIGHT, nil)
 
 	-- Project one rotation from the immutable surface samples. Frames are
 	-- cached on demand so startup only pays for the first visible rotation.
@@ -205,19 +206,27 @@ local function build_c_frame(frame)
 			local shade = math.min(1, 0.14 + diffuse * 0.72 + specular * 0.42)
 			local glyph_index = math.floor(shade * (#glyphs - 1)) + 1
 
-			-- Lighting controls surface detail only. Keep the entire rotating
-			-- C in one material so rotation cannot change its color.
+			-- Treat the C as one lit material: teal shadows, green body, and
+			-- aqua specular highlights. Color follows the surface lighting,
+			-- never the sample order or an arbitrary part of the torus.
+			local material_group = specular > 0.32 and "AlphaAqua"
+				or diffuse > 0.38 and "AlphaGreen"
+				or "AlphaTeal"
+
 			pixels[row][column] = glyphs[glyph_index]
+			groups[row][column] = material_group
 		end
 	end
 
 	return {
 		pixels = pixels,
+		groups = groups,
 	}
 end
 
 local function render_frame(c_frame, glitch_state)
 	local pixels = c_frame.pixels
+	local c_groups = c_frame.groups
 
 	-- Glitch events are selected by the animation state machine, not a fixed
 	-- repeating frame cycle.
@@ -272,7 +281,7 @@ local function render_frame(c_frame, glitch_state)
 
 			if column <= C_WIDTH and row <= C_HEIGHT then
 				char = pixels[row][column]
-				group = char ~= " " and "AlphaGreen" or nil
+				group = char ~= " " and c_groups[row][column] or nil
 			end
 
 			local art_column = column - ART_START + 1
