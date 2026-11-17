@@ -17,15 +17,17 @@ end
 local levels = {}
 for index = 0, 144 do
 	local angle = (index / 144) * math.pi * 2
-	local level = shading.level(math.cos(angle), math.sin(angle), 0)
+	local intensity, level = shading.shade(math.cos(angle), math.sin(angle), 0)
+	check(intensity >= 0 and intensity <= 1, "shade intensity out of range")
 	check(level >= 1 and level <= shading.LEVELS, "shade level out of range")
 	levels[level] = true
 end
 
-local front = shading.level(0, 0, 1)
-local back = shading.level(0, 0, -1)
+local front_intensity, front = shading.shade(0, 0, 1)
+local back_intensity, back = shading.shade(0, 0, -1)
 check(front > back, "front-facing surface should be brighter than the back")
-check(back >= 1, "ambient light should keep the back surface visible")
+check(front_intensity > back_intensity, "front-facing surface should receive more light")
+check(back_intensity == 0, "ambient light should be removed from the material gradient")
 
 local distinct = 0
 for _ in pairs(levels) do
