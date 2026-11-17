@@ -205,8 +205,7 @@ local function build_c_frame(frame)
 			-- camera space. The shading helper uses a fixed camera-space light
 			-- and a view vector, so highlights stay physically coherent as the
 			-- C rotates instead of being guessed from depth alone.
-			local shade_level = LogoShading.level(normal_x, sample.normal_y, normal_z)
-			local shade = (shade_level - 1) / (LogoShading.LEVELS - 1)
+			local shade, shade_level = LogoShading.shade(normal_x, sample.normal_y, normal_z)
 			local glyph_index = math.floor(shade * (#glyphs - 1) + 0.5) + 1
 			local material_group = "AlphaCShade" .. shade_level
 
