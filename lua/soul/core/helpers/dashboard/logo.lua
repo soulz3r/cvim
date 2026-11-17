@@ -1,4 +1,5 @@
 local M = {}
+local LogoShading = require("soul.core.helpers.dashboard.logo_shading")
 
 -- Keep profiling infrastructure out of normal startup. The dashboard still
 -- uses the same call sites, backed by no-ops unless profiling is requested.
@@ -200,16 +201,14 @@ local function build_c_frame(frame)
 
 			local normal_x = sample.normal_x * cosine + sample.normal_z * sine
 			local normal_z = -sample.normal_x * sine + sample.normal_z * cosine
-			local diffuse = math.max(0, normal_x * LIGHT_X + sample.normal_y * LIGHT_Y + normal_z * LIGHT_Z)
-			local view = math.max(0, normal_z)
-			local specular = view ^ 10
-			local shade = math.min(1, 0.14 + diffuse * 0.72 + specular * 0.42)
-			local glyph_index = math.floor(shade * (#glyphs - 1)) + 1
-
-			-- Treat the C as one lit material: teal shadows, green body, and
-			-- aqua specular highlights. Color follows the surface lighting,
-			-- never the sample order or an arbitrary part of the torus.
-			local material_group = specular > 0.32 and "AlphaAqua" or diffuse > 0.38 and "AlphaGreen" or "AlphaTeal"
+			-- Both diffuse and specular lighting use the rotated normal in
+			-- camera space. The shading helper uses a fixed camera-space light
+			-- and a view vector, so highlights stay physically coherent as the
+			-- C rotates instead of being guessed from depth alone.
+			local shade_level = LogoShading.level(normal_x, sample.normal_y, normal_z)
+			local shade = (shade_level - 1) / (LogoShading.LEVELS - 1)
+			local glyph_index = math.floor(shade * (#glyphs - 1) + 0.5) + 1
+			local material_group = "AlphaCShade" .. shade_level
 
 			pixels[row][column] = glyphs[glyph_index]
 			groups[row][column] = material_group
