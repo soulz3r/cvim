@@ -209,9 +209,7 @@ local function build_c_frame(frame)
 			-- Use the rotated normal for both color and glyph density.
 			-- The previous object-space color calculation ignored the rotation,
 			-- so the palette could disagree with the surface's actual lighting.
-			local material_group = shade > 0.78 and "AlphaAqua"
-				or shade > 0.44 and "AlphaTeal"
-				or "AlphaGreen"
+			local material_group = shade > 0.78 and "AlphaAqua" or shade > 0.44 and "AlphaTeal" or "AlphaGreen"
 
 			pixels[row][column] = glyphs[glyph_index]
 			groups[row][column] = material_group
