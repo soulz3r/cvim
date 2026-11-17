@@ -111,6 +111,7 @@ local function get_surface_samples()
 		local theta = math.rad(48 + theta_step * (264 / 144))
 		local theta_cos = math.cos(theta)
 		local theta_sin = math.sin(theta)
+		local material_group = MATERIAL_GROUPS[math.floor(theta_step * #MATERIAL_GROUPS / 145) + 1]
 
 		for phi_step = 0, 63 do
 			local phi = phi_step * (2 * math.pi / 64)
@@ -125,6 +126,7 @@ local function get_surface_samples()
 				normal_x = phi_cos * theta_cos,
 				normal_y = phi_cos * theta_sin,
 				normal_z = phi_sin,
+				material_group = material_group,
 			}
 		end
 	end
@@ -137,6 +139,10 @@ local function get_surface_samples()
 
 	return SURFACE_SAMPLES
 end
+
+-- Three broad material bands run along the C's stroke. Their boundaries
+-- are fixed in object space, so rotation cannot make the palette drift.
+local MATERIAL_GROUPS = { "AlphaGreen", "AlphaTeal", "AlphaAqua" }
 
 local LIGHT_X, LIGHT_Y, LIGHT_Z = -0.35, 0.55, 0.76
 local LIGHT_LENGTH = math.sqrt(LIGHT_X ^ 2 + LIGHT_Y ^ 2 + LIGHT_Z ^ 2)
@@ -206,20 +212,13 @@ local function build_c_frame(frame)
 			local shade = math.min(1, 0.14 + diffuse * 0.72 + specular * 0.42)
 			local glyph_index = math.floor(shade * (#glyphs - 1)) + 1
 
-			-- Lighting follows the world as the C rotates, but the material
-			-- color belongs to the surface itself. Using the rotated normal
-			-- here made color bands slide across the logo and flicker at cell
-			-- boundaries. Keep the color classification in object space so
-			-- each surface patch retains its color throughout the rotation.
-			local material_light = math.max(
-				0,
-				sample.normal_x * LIGHT_X + sample.normal_y * LIGHT_Y + sample.normal_z * LIGHT_Z
-			)
-
+			-- Material color is attached to the C's major-ring coordinate,
+			-- not its lighting normal. Broad arc segments keep neighboring
+			-- samples in the same palette band when rasterization moves the
+			-- winning sample between adjacent cells during rotation. Lighting
+			-- still controls glyph density independently.
 			pixels[row][column] = glyphs[glyph_index]
-			groups[row][column] = material_light > 0.82 and "AlphaAqua"
-				or material_light > 0.48 and "AlphaTeal"
-				or "AlphaGreen"
+			groups[row][column] = sample.material_group
 		end
 	end
 
