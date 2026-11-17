@@ -22,12 +22,19 @@ local DIFFUSE_STRENGTH = 0.68
 local SPECULAR_STRENGTH = 0.24
 local SPECULAR_POWER = 18
 
-function M.level(normal_x, normal_y, normal_z)
+function M.shade(normal_x, normal_y, normal_z)
 	local diffuse = math.max(0, normal_x * LIGHT_X + normal_y * LIGHT_Y + normal_z * LIGHT_Z)
-	local specular = math.max(0, normal_x * HALF_X + normal_y * HALF_Y + normal_z * HALF_Z) ^ SPECULAR_POWER
+	local specular = 0
+
+	if diffuse > 0 then
+		specular = math.max(0, normal_x * HALF_X + normal_y * HALF_Y + normal_z * HALF_Z) ^ SPECULAR_POWER
+	end
 
 	local intensity = math.min(1, AMBIENT + diffuse * DIFFUSE_STRENGTH + specular * SPECULAR_STRENGTH)
-	return math.floor(intensity * (M.LEVELS - 1) + 0.5) + 1
+	local shade = (intensity - AMBIENT) / (1 - AMBIENT)
+	local level = math.floor(shade * (M.LEVELS - 1) + 0.5) + 1
+
+	return shade, level
 end
 
 return M
