@@ -643,6 +643,7 @@ if command -v nvim >/dev/null 2>&1; then
   # A real file-backed startup must not load Alpha or any CVIM dashboard helper.
   printf 'return true\n' >"$TEMP_DIR/cvim-file-startup.lua"
   run_check "Dashboard skipped on file startup" 0 "$PYTHON" - "$ROOT" "$TEMP_DIR/cvim-file-startup.lua" <<'PY'
+import os
 import subprocess
 import sys
 
@@ -661,16 +662,14 @@ lua_check = (
     'if not ok then io.stderr:write(tostring(err) .. "\\n"); vim.cmd("cquit") '
     'else vim.cmd("qa!") end'
 )
-command = (
-    'export CVIM_CONFIG="$1"; '
-    # Neovim command-line options must come before the file argument.
-    # -c accepts an Ex command; explicitly enter Lua before running the check.
-    'exec nvim --headless -u "$1/init.lua" -c "lua $3" "$2"'
-)
+
+environment = os.environ.copy()
+environment["CVIM_CONFIG"] = root
 
 try:
     result = subprocess.run(
-        ["bash", "-c", command, "cvim-file-startup", root, fixture, lua_check],
+        ["nvim", "--headless", "-u", os.path.join(root, "init.lua"), "-c", f"lua {lua_check}", fixture],
+        env=environment,
         capture_output=True,
         text=True,
         timeout=20,
