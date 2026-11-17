@@ -94,6 +94,10 @@ for row, line in ipairs(WORDMARK) do
 	WORDMARK_CHARS[row] = split_chars(line)
 end
 
+-- Three broad material bands run along the C's stroke. Their boundaries
+-- are fixed in object space, so rotation cannot make the palette drift.
+local MATERIAL_GROUPS = { "AlphaGreen", "AlphaTeal", "AlphaAqua" }
+
 -- The surface never changes. Build its trigonometric coordinates only
 -- when the dashboard first requests a rotation frame, not when this module
 -- is imported by another dashboard helper.
@@ -139,10 +143,6 @@ local function get_surface_samples()
 
 	return SURFACE_SAMPLES
 end
-
--- Three broad material bands run along the C's stroke. Their boundaries
--- are fixed in object space, so rotation cannot make the palette drift.
-local MATERIAL_GROUPS = { "AlphaGreen", "AlphaTeal", "AlphaAqua" }
 
 local LIGHT_X, LIGHT_Y, LIGHT_Z = -0.35, 0.55, 0.76
 local LIGHT_LENGTH = math.sqrt(LIGHT_X ^ 2 + LIGHT_Y ^ 2 + LIGHT_Z ^ 2)
