@@ -94,10 +94,6 @@ for row, line in ipairs(WORDMARK) do
 	WORDMARK_CHARS[row] = split_chars(line)
 end
 
--- Three material bands wrap around the tube cross-section. Each band spans
--- the full C stroke, keeping the palette consistent from end to end.
-local MATERIAL_GROUPS = { "AlphaGreen", "AlphaTeal", "AlphaAqua" }
-
 -- The surface never changes. Build its trigonometric coordinates only
 -- when the dashboard first requests a rotation frame, not when this module
 -- is imported by another dashboard helper.
@@ -118,7 +114,6 @@ local function get_surface_samples()
 
 		for phi_step = 0, 63 do
 			local phi = phi_step * (2 * math.pi / 64)
-			local material_group = MATERIAL_GROUPS[math.floor(phi_step * #MATERIAL_GROUPS / 64) + 1]
 			local phi_cos = math.cos(phi)
 			local phi_sin = math.sin(phi)
 			local radius = 1 + 0.23 * phi_cos
@@ -130,7 +125,6 @@ local function get_surface_samples()
 				normal_x = phi_cos * theta_cos,
 				normal_y = phi_cos * theta_sin,
 				normal_z = phi_sin,
-				material_group = material_group,
 			}
 		end
 	end
@@ -212,13 +206,15 @@ local function build_c_frame(frame)
 			local shade = math.min(1, 0.14 + diffuse * 0.72 + specular * 0.42)
 			local glyph_index = math.floor(shade * (#glyphs - 1)) + 1
 
-			-- Material color is attached to the C's major-ring coordinate,
-			-- not its lighting normal. Broad arc segments keep neighboring
-			-- samples in the same palette band when rasterization moves the
-			-- winning sample between adjacent cells during rotation. Lighting
-			-- still controls glyph density independently.
+			-- Use the rotated normal for both color and glyph density.
+			-- The previous object-space color calculation ignored the rotation,
+			-- so the palette could disagree with the surface's actual lighting.
+			local material_group = shade > 0.78 and "AlphaAqua"
+				or shade > 0.44 and "AlphaTeal"
+				or "AlphaGreen"
+
 			pixels[row][column] = glyphs[glyph_index]
-			groups[row][column] = sample.material_group
+			groups[row][column] = material_group
 		end
 	end
 
