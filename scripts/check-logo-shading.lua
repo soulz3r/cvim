@@ -1,3 +1,11 @@
+local root = vim.fn.getcwd()
+vim.opt.rtp:prepend(root)
+package.path = table.concat({
+	root .. "/lua/?.lua",
+	root .. "/lua/?/init.lua",
+	package.path,
+}, ";")
+
 local shading = require("soul.core.helpers.dashboard.logo_shading")
 
 local function check(condition, message)
