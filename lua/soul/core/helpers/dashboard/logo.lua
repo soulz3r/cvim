@@ -209,9 +209,7 @@ local function build_c_frame(frame)
 			-- Treat the C as one lit material: teal shadows, green body, and
 			-- aqua specular highlights. Color follows the surface lighting,
 			-- never the sample order or an arbitrary part of the torus.
-			local material_group = specular > 0.32 and "AlphaAqua"
-				or diffuse > 0.38 and "AlphaGreen"
-				or "AlphaTeal"
+			local material_group = specular > 0.32 and "AlphaAqua" or diffuse > 0.38 and "AlphaGreen" or "AlphaTeal"
 
 			pixels[row][column] = glyphs[glyph_index]
 			groups[row][column] = material_group
