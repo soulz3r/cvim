@@ -453,9 +453,18 @@ end
 local file_sorter = _G.cvim_test_find_files_sorter
 local grep_sorter = _G.cvim_test_live_grep_sorter
 local git_file_sorter = _G.cvim_test_git_files_sorter
-assert(type(file_sorter) == "table" and type(file_sorter.scoring_function) == "function", "find_files sorter was not passed")
-assert(type(grep_sorter) == "table" and type(grep_sorter.scoring_function) == "function", "live_grep sorter was not passed")
-assert(type(git_file_sorter) == "table" and type(git_file_sorter.scoring_function) == "function", "git_files sorter was not passed")
+assert(
+	type(file_sorter) == "table" and type(file_sorter.scoring_function) == "function",
+	"find_files sorter was not passed"
+)
+assert(
+	type(grep_sorter) == "table" and type(grep_sorter.scoring_function) == "function",
+	"live_grep sorter was not passed"
+)
+assert(
+	type(git_file_sorter) == "table" and type(git_file_sorter.scoring_function) == "function",
+	"git_files sorter was not passed"
+)
 
 local exact_file = file_sorter.scoring_function(nil, "main", "main.c")
 local prefix_file = file_sorter.scoring_function(nil, "main", "main_old.c")
@@ -467,10 +476,13 @@ assert(
 )
 
 local exact_line = grep_sorter.scoring_function(nil, "needle", "src/file.c:1:1:needle", { text = "needle" })
-local prefix_line = grep_sorter.scoring_function(nil, "needle", "src/file.c:1:1:needle appears", { text = "needle appears" })
-local substring_line = grep_sorter.scoring_function(nil, "needle", "src/file.c:1:1:prefix needle", { text = "prefix needle" })
+local prefix_line =
+	grep_sorter.scoring_function(nil, "needle", "src/file.c:1:1:needle appears", { text = "needle appears" })
+local substring_line =
+	grep_sorter.scoring_function(nil, "needle", "src/file.c:1:1:prefix needle", { text = "prefix needle" })
 local fuzzy_line = grep_sorter.scoring_function(nil, "needle", "src/file.c:1:1:n_e_e_d_l_e", { text = "n_e_e_d_l_e" })
-local path_only_match = grep_sorter.scoring_function(nil, "needle", "needle/file.c:1:1:unrelated", { text = "unrelated" })
+local path_only_match =
+	grep_sorter.scoring_function(nil, "needle", "needle/file.c:1:1:unrelated", { text = "unrelated" })
 assert(
 	exact_line < prefix_line and prefix_line < substring_line and substring_line < fuzzy_line,
 	"Live grep must rank exact line, prefix, substring, then fuzzy matches"
