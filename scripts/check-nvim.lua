@@ -399,6 +399,9 @@ package.loaded["telescope.sorters"] = {
 	new = function(options)
 		return options
 	end,
+	highlighter_only = function()
+		return { test_default_highlighter = true }
+	end,
 }
 package.loaded["telescope.algos.fzy"] = {
 	get_score_floor = function()
@@ -436,8 +439,8 @@ package.loaded["telescope.builtin"] = {
 	find_files = function(opts)
 		_G.cvim_test_find_files_sorter = opts.sorter
 	end,
-	live_grep = function(opts)
-		_G.cvim_test_live_grep_sorter = opts.sorter
+	live_grep = function()
+		_G.cvim_test_live_grep_sorter = package.loaded["telescope.sorters"].highlighter_only()
 	end,
 	git_files = function(opts)
 		_G.cvim_test_git_files_sorter = opts.sorter
@@ -458,6 +461,10 @@ end
 
 local file_sorter = _G.cvim_test_find_files_sorter
 local grep_sorter = _G.cvim_test_live_grep_sorter
+assert(
+	type(grep_sorter) == "table" and type(grep_sorter.scoring_function) == "function",
+	"live_grep must replace Telescope's hardcoded highlighter-only sorter"
+)
 local git_file_sorter = _G.cvim_test_git_files_sorter
 assert(
 	type(file_sorter) == "table" and type(file_sorter.scoring_function) == "function",
