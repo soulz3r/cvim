@@ -81,4 +81,39 @@ function M.filename_first()
 	})
 end
 
+
+-- live_grep's built-in sorter only highlights matches and gives every result
+-- the same score. Rank the actual matched line instead of the full
+-- "filename:line:column:text" ordinal so paths cannot outrank relevant code.
+function M.live_grep()
+	local sorters = require("telescope.sorters")
+	local fzy = require("telescope.algos.fzy")
+	local offset = -fzy.get_score_floor()
+
+	return sorters.new({
+		discard = true,
+		scoring_function = function(_, prompt, ordinal, entry)
+			if prompt == "" then
+				return 1
+			end
+
+			local text = entry and entry.text or ordinal
+			local literal = literal_score(prompt, text)
+			if literal ~= nil then
+				return literal
+			end
+
+			local fuzzy = fuzzy_score(fzy, prompt, text, offset)
+			if fuzzy ~= nil then
+				return 0.4 + fuzzy
+			end
+
+			return -1
+		end,
+		highlighter = function(_, prompt, display)
+			return fzy.positions(prompt, display)
+		end,
+	})
+end
+
 return M
