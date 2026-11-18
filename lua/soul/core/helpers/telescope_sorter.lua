@@ -71,9 +71,7 @@ function M.filename_first()
 			end
 
 			-- Keep fuzzy matching, but place it below every literal match.
-			return fuzzy_score(fzy, prompt, filename, 400000)
-				or fuzzy_score(fzy, prompt, ordinal, 300000)
-				or -1
+			return fuzzy_score(fzy, prompt, filename, 400000) or fuzzy_score(fzy, prompt, ordinal, 300000) or -1
 		end,
 		highlighter = function(_, prompt, display)
 			return fzy.positions(prompt, display)
