@@ -76,7 +76,7 @@ function M.config()
 
 			initial_mode = "insert",
 			selection_strategy = "reset",
-			sorting_strategy = "descending",
+			sorting_strategy = "ascending",
 			scroll_strategy = "cycle",
 
 			path_display = { "tail" },
