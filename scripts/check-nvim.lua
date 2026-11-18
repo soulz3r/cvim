@@ -403,10 +403,9 @@ assert(
 	"Blink completion must rank exact matches before fuzzy score"
 )
 
--- Telescope's picker-specific setup table is not applied by these builtins:
--- find_files uses conf.file_sorter(opts), while live_grep uses a constant
--- score highlighter. Exercise the explicit sorter arguments passed by CVim's
--- key handlers and verify relevance ordering against representative entries.
+-- Exercise CVim's explicit Telescope sorters and the dedicated live-grep
+-- picker. Its entry-maker test above verifies duplicate suppression and reset
+-- behavior between prompt updates.
 local telescope_sorters = package.loaded["telescope.sorters"]
 local telescope_fzy = package.loaded["telescope.algos.fzy"]
 local telescope_builtin = package.loaded["telescope.builtin"]
