@@ -30,13 +30,28 @@ local function fuzzy_score(fzy, prompt, candidate)
 		return nil
 	end
 
-	-- Normalize fzy's score into [0, 1]. Without this, weak filename fuzzy
-	-- matches can overlap the directory-match score band.
-	local score_floor = fzy.get_score_floor()
-	local score_ceiling = #prompt + 1
-	local distance = (score_ceiling - score) / (score_ceiling - score_floor)
+	if score == fzy.get_score_max() then
+		return 0
+	end
 
-	return math.max(0, math.min(1, distance))
+	-- Match Telescope's own fzy sorter: lower scores are better, and exact
+	-- matches resolve to zero. This preserves fzy's ranking instead of
+	-- flattening many literal matches into the same result score.
+	return 1 / (score - fzy.get_score_floor())
+end
+
+local function ranked_literal_score(fzy, prompt, candidate)
+	local literal = literal_score(prompt, candidate)
+	if literal == nil then
+		return nil
+	end
+
+	local fuzzy = fuzzy_score(fzy, prompt, candidate) or 1
+
+	-- Keep exact/prefix/substring tiers separate, but let fzy rank results
+	-- inside each tier. Otherwise every same-position substring match ties,
+	-- leaving ripgrep's arrival order to decide the first results.
+	return literal + fuzzy * 0.01
 end
 
 function M.filename_first()
@@ -54,14 +69,14 @@ function M.filename_first()
 
 			-- Exact filename, prefix, and substring matches get progressively
 			-- worse scores. Telescope sorts lower scores before higher scores.
-			local filename_literal = literal_score(prompt, filename)
+			local filename_literal = ranked_literal_score(fzy, prompt, filename)
 			if filename_literal ~= nil then
 				return filename_literal
 			end
 
 			-- A literal match in a directory is useful, but less relevant than
 			-- the same match in the filename.
-			local path_literal = literal_score(prompt, ordinal)
+			local path_literal = ranked_literal_score(fzy, prompt, ordinal)
 			if path_literal ~= nil then
 				return 0.2 + path_literal
 			end
@@ -100,7 +115,7 @@ function M.live_grep()
 			end
 
 			local text = entry and entry.text or ordinal
-			local literal = literal_score(prompt, text)
+			local literal = ranked_literal_score(fzy, prompt, text)
 			if literal ~= nil then
 				return literal
 			end

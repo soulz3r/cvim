@@ -498,6 +498,15 @@ assert(
 )
 assert(path_only_match == -1, "Live grep must not rank a result because its filename alone matches")
 
+local stronger_same_position =
+	grep_sorter.scoring_function(nil, "needle", "src/a.c:1:1:needle strong", { text = "needle strong" })
+local weaker_same_position =
+	grep_sorter.scoring_function(nil, "needle", "src/b.c:1:1:needle weak", { text = "needle weak" })
+assert(
+	stronger_same_position < weaker_same_position,
+	"Live grep must rank same-position literal matches by fzy relevance instead of preserving ripgrep arrival order"
+)
+
 local telescope_source = table.concat(vim.fn.readfile(root .. "/lua/soul/plugins/telescope.lua"), "\n")
 assert(telescope_source:find("previewer = true", 1, true), "Telescope searches must explicitly enable preview")
 assert(
