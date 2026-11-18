@@ -381,6 +381,21 @@ for _, name in ipairs(modules) do
 	assert(type(spec) == "table", name .. " did not return a plugin spec table")
 end
 
+local live_grep_helper = require("soul.core.helpers.telescope_live_grep")
+local deduped_entry_maker, reset_duplicate_entries = live_grep_helper.dedupe_entry_maker(function(line)
+	return {
+		filename = "src/main.c",
+		lnum = 12,
+		col = 4,
+		text = line,
+		ordinal = line,
+	}
+end)
+assert(deduped_entry_maker("same result") ~= nil, "Live grep must keep the first occurrence")
+assert(deduped_entry_maker("same result") == nil, "Live grep must discard an exact duplicate result")
+reset_duplicate_entries()
+assert(deduped_entry_maker("same result") ~= nil, "Live grep must reset duplicate tracking for each prompt")
+
 local telescope_spec = require("soul.plugins.telescope")
 local blink_spec = require("soul.cmp.blink")
 assert(
@@ -439,11 +454,14 @@ package.loaded["telescope.builtin"] = {
 	find_files = function(opts)
 		_G.cvim_test_find_files_sorter = opts.sorter
 	end,
-	live_grep = function()
-		_G.cvim_test_live_grep_sorter = package.loaded["telescope.sorters"].highlighter_only()
-	end,
 	git_files = function(opts)
 		_G.cvim_test_git_files_sorter = opts.sorter
+	end,
+}
+local original_live_grep_helper = package.loaded["soul.core.helpers.telescope_live_grep"]
+package.loaded["soul.core.helpers.telescope_live_grep"] = {
+	open = function()
+		_G.cvim_test_live_grep_opened = true
 	end,
 }
 
@@ -454,17 +472,14 @@ end
 for _, key in ipairs({ "<leader>ff", "<leader>ft", "<leader>fgf" }) do
 	assert(
 		type(telescope_key_handlers[key]) == "function",
-		("Telescope %s must pass its explicit relevance sorter to the builtin"):format(key)
+		("Telescope %s must have a real search handler"):format(key)
 	)
 	telescope_key_handlers[key]()
 end
 
 local file_sorter = _G.cvim_test_find_files_sorter
-local grep_sorter = _G.cvim_test_live_grep_sorter
-assert(
-	type(grep_sorter) == "table" and type(grep_sorter.scoring_function) == "function",
-	"live_grep must replace Telescope's hardcoded highlighter-only sorter"
-)
+local grep_sorter = require("soul.core.helpers.telescope_sorter").live_grep()
+assert(_G.cvim_test_live_grep_opened, "Live grep keymap must call the dedicated deduplicating picker")
 local git_file_sorter = _G.cvim_test_git_files_sorter
 assert(
 	type(file_sorter) == "table" and type(file_sorter.scoring_function) == "function",
@@ -472,7 +487,7 @@ assert(
 )
 assert(
 	type(grep_sorter) == "table" and type(grep_sorter.scoring_function) == "function",
-	"live_grep sorter was not passed"
+	"live_grep sorter was not created"
 )
 assert(
 	type(git_file_sorter) == "table" and type(git_file_sorter.scoring_function) == "function",
@@ -524,11 +539,12 @@ assert(
 	"No Telescope search mapping may disable preview"
 )
 _G.cvim_test_find_files_sorter = nil
-_G.cvim_test_live_grep_sorter = nil
+_G.cvim_test_live_grep_opened = nil
 _G.cvim_test_git_files_sorter = nil
 package.loaded["telescope.sorters"] = telescope_sorters
 package.loaded["telescope.algos.fzy"] = telescope_fzy
 package.loaded["telescope.builtin"] = telescope_builtin
+package.loaded["soul.core.helpers.telescope_live_grep"] = original_live_grep_helper
 
 assert(
 	package.loaded["soul.core.helpers.fzf_native"] == nil,

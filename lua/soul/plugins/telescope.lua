@@ -17,22 +17,7 @@ local M = {
 		{
 			"<leader>ft",
 			function()
-				local sorters = require("telescope.sorters")
-				local original_highlighter_only = sorters.highlighter_only
-
-				-- This pinned Telescope version hardcodes highlighter_only() inside
-				-- builtin.live_grep() and ignores opts.sorter. Override it only while
-				-- the picker is being constructed, then restore the shared module.
-				sorters.highlighter_only = function()
-					return require("soul.core.helpers.telescope_sorter").live_grep()
-				end
-
-				local ok, err = pcall(require("telescope.builtin").live_grep)
-				sorters.highlighter_only = original_highlighter_only
-
-				if not ok then
-					error(err)
-				end
+				require("soul.core.helpers.telescope_live_grep").open()
 			end,
 			desc = "Live Grep",
 		},
