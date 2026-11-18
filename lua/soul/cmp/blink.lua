@@ -45,7 +45,12 @@ local M = {
 				show_documentation = true,
 			},
 		},
-		fuzzy = { implementation = "prefer_rust_with_warning" },
+		fuzzy = {
+			implementation = "prefer_rust_with_warning",
+			-- Exact label/filterText matches must outrank fuzzy candidates.
+			-- This applies to both insert-mode and command-line completion.
+			sorts = { "exact", "score", "sort_text" },
+		},
 	},
 
 	opts_extend = { "sources.default" },
