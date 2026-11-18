@@ -501,8 +501,7 @@ assert(path_only_match == -1, "Live grep must not rank a result because its file
 local telescope_source = table.concat(vim.fn.readfile(root .. "/lua/soul/plugins/telescope.lua"), "\n")
 assert(telescope_source:find("previewer = true", 1, true), "Telescope searches must explicitly enable preview")
 assert(
-	not telescope_source:find("previewer = false", 1, true)
-		and not telescope_source:find("previewer=false", 1, true),
+	not telescope_source:find("previewer = false", 1, true) and not telescope_source:find("previewer=false", 1, true),
 	"No Telescope search mapping may disable preview"
 )
 _G.cvim_test_find_files_sorter = nil
