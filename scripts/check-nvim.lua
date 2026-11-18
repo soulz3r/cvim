@@ -387,6 +387,102 @@ assert(
 	vim.deep_equal(blink_spec.opts.fuzzy.sorts, { "exact", "score", "sort_text" }),
 	"Blink completion must rank exact matches before fuzzy score"
 )
+
+-- Telescope's picker-specific setup table is not applied by these builtins:
+-- find_files uses conf.file_sorter(opts), while live_grep uses a constant
+-- score highlighter. Exercise the explicit sorter arguments passed by CVim's
+-- key handlers and verify relevance ordering against representative entries.
+local telescope_sorters = package.loaded["telescope.sorters"]
+local telescope_fzy = package.loaded["telescope.algos.fzy"]
+local telescope_builtin = package.loaded["telescope.builtin"]
+package.loaded["telescope.sorters"] = {
+	new = function(options)
+		return options
+	end,
+}
+package.loaded["telescope.algos.fzy"] = {
+	get_score_floor = function()
+		return -100
+	end,
+	get_score_min = function()
+		return 0
+	end,
+	has_match = function(prompt, candidate)
+		local position = 1
+		for index = 1, #candidate do
+			if candidate:sub(index, index):lower() == prompt:sub(position, position):lower() then
+				position = position + 1
+				if position > #prompt then
+					return true
+				end
+			end
+		end
+		return prompt == ""
+	end,
+	score = function()
+		return 100
+	end,
+	positions = function()
+		return {}
+	end,
+}
+package.loaded["telescope.builtin"] = {
+	find_files = function(opts)
+		_G.cvim_test_find_files_sorter = opts.sorter
+	end,
+	live_grep = function(opts)
+		_G.cvim_test_live_grep_sorter = opts.sorter
+	end,
+	git_files = function(opts)
+		_G.cvim_test_git_files_sorter = opts.sorter
+	end,
+}
+
+local telescope_key_handlers = {}
+for _, mapping in ipairs(telescope_spec.keys or {}) do
+	telescope_key_handlers[mapping[1]] = mapping[2]
+end
+for _, key in ipairs({ "<leader>ff", "<leader>ft", "<leader>fgf" }) do
+	assert(
+		type(telescope_key_handlers[key]) == "function",
+		("Telescope %s must pass its explicit relevance sorter to the builtin"):format(key)
+	)
+	telescope_key_handlers[key]()
+end
+
+local file_sorter = _G.cvim_test_find_files_sorter
+local grep_sorter = _G.cvim_test_live_grep_sorter
+local git_file_sorter = _G.cvim_test_git_files_sorter
+assert(type(file_sorter) == "table" and type(file_sorter.scoring_function) == "function", "find_files sorter was not passed")
+assert(type(grep_sorter) == "table" and type(grep_sorter.scoring_function) == "function", "live_grep sorter was not passed")
+assert(type(git_file_sorter) == "table" and type(git_file_sorter.scoring_function) == "function", "git_files sorter was not passed")
+
+local exact_file = file_sorter.scoring_function(nil, "main", "main.c")
+local prefix_file = file_sorter.scoring_function(nil, "main", "main_old.c")
+local substring_file = file_sorter.scoring_function(nil, "main", "old_main.c")
+local fuzzy_file = file_sorter.scoring_function(nil, "main", "m_a_i_n.c")
+assert(
+	exact_file < prefix_file and prefix_file < substring_file and substring_file < fuzzy_file,
+	"File search must rank exact filename, prefix, substring, then fuzzy matches"
+)
+
+local exact_line = grep_sorter.scoring_function(nil, "needle", "src/file.c:1:1:needle", { text = "needle" })
+local prefix_line = grep_sorter.scoring_function(nil, "needle", "src/file.c:1:1:needle appears", { text = "needle appears" })
+local substring_line = grep_sorter.scoring_function(nil, "needle", "src/file.c:1:1:prefix needle", { text = "prefix needle" })
+local fuzzy_line = grep_sorter.scoring_function(nil, "needle", "src/file.c:1:1:n_e_e_d_l_e", { text = "n_e_e_d_l_e" })
+local path_only_match = grep_sorter.scoring_function(nil, "needle", "needle/file.c:1:1:unrelated", { text = "unrelated" })
+assert(
+	exact_line < prefix_line and prefix_line < substring_line and substring_line < fuzzy_line,
+	"Live grep must rank exact line, prefix, substring, then fuzzy matches"
+)
+assert(path_only_match == -1, "Live grep must not rank a result because its filename alone matches")
+_G.cvim_test_find_files_sorter = nil
+_G.cvim_test_live_grep_sorter = nil
+_G.cvim_test_git_files_sorter = nil
+package.loaded["telescope.sorters"] = telescope_sorters
+package.loaded["telescope.algos.fzy"] = telescope_fzy
+package.loaded["telescope.builtin"] = telescope_builtin
+
 assert(
 	package.loaded["soul.core.helpers.fzf_native"] == nil,
 	"Telescope plugin spec must not eagerly load the native build helper"
