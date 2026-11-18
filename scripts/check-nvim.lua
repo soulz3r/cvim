@@ -420,7 +420,7 @@ package.loaded["telescope.algos.fzy"] = {
 		return prompt == ""
 	end,
 	score = function()
-		return 100
+		return 0.5
 	end,
 	positions = function()
 		return {}
@@ -470,9 +470,15 @@ local exact_file = file_sorter.scoring_function(nil, "main.c", "main.c")
 local prefix_file = file_sorter.scoring_function(nil, "main.c", "main.c.old")
 local substring_file = file_sorter.scoring_function(nil, "main.c", "old_main.c")
 local fuzzy_file = file_sorter.scoring_function(nil, "main.c", "m_a_i_n.c")
+local path_literal = file_sorter.scoring_function(nil, "main.c", "src/main.c/other.c")
+local fuzzy_path = file_sorter.scoring_function(nil, "main.c", "src/m_a_i_n.c/other.c")
 assert(
-	exact_file < prefix_file and prefix_file < substring_file and substring_file < fuzzy_file,
-	"File search must rank exact filename, prefix, substring, then fuzzy matches"
+	exact_file < prefix_file
+		and prefix_file < substring_file
+		and substring_file < path_literal
+		and path_literal < fuzzy_file
+		and fuzzy_file < fuzzy_path,
+	"File search must rank exact filename, prefix, substring, path literal, filename fuzzy, then path fuzzy matches"
 )
 
 local exact_line = grep_sorter.scoring_function(nil, "needle", "src/file.c:1:1:needle", { text = "needle" })
@@ -488,6 +494,14 @@ assert(
 	"Live grep must rank exact line, prefix, substring, then fuzzy matches"
 )
 assert(path_only_match == -1, "Live grep must not rank a result because its filename alone matches")
+
+local telescope_source = table.concat(vim.fn.readfile(root .. "/lua/soul/plugins/telescope.lua"), "\n")
+assert(telescope_source:find("previewer = true", 1, true), "Telescope searches must explicitly enable preview")
+assert(
+	not telescope_source:find("previewer = false", 1, true)
+		and not telescope_source:find("previewer=false", 1, true),
+	"No Telescope search mapping may disable preview"
+)
 _G.cvim_test_find_files_sorter = nil
 _G.cvim_test_live_grep_sorter = nil
 _G.cvim_test_git_files_sorter = nil

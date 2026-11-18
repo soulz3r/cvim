@@ -20,7 +20,7 @@ local function literal_score(prompt, candidate)
 	return nil
 end
 
-local function fuzzy_score(fzy, prompt, candidate, offset)
+local function fuzzy_score(fzy, prompt, candidate)
 	if candidate == "" or not fzy.has_match(prompt, candidate) then
 		return nil
 	end
@@ -30,14 +30,14 @@ local function fuzzy_score(fzy, prompt, candidate, offset)
 		return nil
 	end
 
-	-- Telescope sorts in ascending order: lower scores are better.
-	return 1 / (score + offset)
+	-- fzy scores higher-quality matches higher; Telescope sorts lower scores first.
+	-- Keep fuzzy matches below literal matches with a stable, linear distance.
+	return 2 - score
 end
 
 function M.filename_first()
 	local sorters = require("telescope.sorters")
 	local fzy = require("telescope.algos.fzy")
-	local offset = -fzy.get_score_floor()
 
 	return sorters.new({
 		discard = true,
@@ -63,12 +63,12 @@ function M.filename_first()
 			end
 
 			-- Preserve fuzzy matching below all literal matches.
-			local filename_fuzzy = fuzzy_score(fzy, prompt, filename, offset)
+			local filename_fuzzy = fuzzy_score(fzy, prompt, filename)
 			if filename_fuzzy ~= nil then
 				return 0.4 + filename_fuzzy
 			end
 
-			local path_fuzzy = fuzzy_score(fzy, prompt, ordinal, offset)
+			local path_fuzzy = fuzzy_score(fzy, prompt, ordinal)
 			if path_fuzzy ~= nil then
 				return 0.7 + path_fuzzy
 			end
@@ -87,7 +87,6 @@ end
 function M.live_grep()
 	local sorters = require("telescope.sorters")
 	local fzy = require("telescope.algos.fzy")
-	local offset = -fzy.get_score_floor()
 
 	return sorters.new({
 		discard = true,
@@ -102,7 +101,7 @@ function M.live_grep()
 				return literal
 			end
 
-			local fuzzy = fuzzy_score(fzy, prompt, text, offset)
+			local fuzzy = fuzzy_score(fzy, prompt, text)
 			if fuzzy ~= nil then
 				return 0.4 + fuzzy
 			end

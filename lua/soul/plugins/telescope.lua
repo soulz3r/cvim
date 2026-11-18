@@ -3,7 +3,7 @@ local M = {
 	cmd = "Telescope",
 
 	keys = {
-		{ "<leader>fb", "<cmd>Telescope buffers previewer=false<CR>", desc = "Buffers" },
+		{ "<leader>fb", "<cmd>Telescope buffers<CR>", desc = "Buffers" },
 		{ "<leader>fC", "<cmd>Telescope colorscheme<CR>", desc = "Colorscheme" },
 		{
 			"<leader>ff",
@@ -99,6 +99,7 @@ function M.config()
 			entry_prefix = " ",
 
 			initial_mode = "insert",
+			previewer = true,
 			selection_strategy = "reset",
 			sorting_strategy = "descending",
 			scroll_strategy = "cycle",
@@ -167,19 +168,22 @@ function M.config()
 
 			live_grep = {
 				theme = "dropdown",
+				previewer = true,
 			},
 
 			git_files = {
 				theme = "dropdown",
+				previewer = true,
 			},
 
 			grep_string = {
 				theme = "dropdown",
+				previewer = true,
 			},
 
 			buffers = {
 				theme = "dropdown",
-				previewer = false,
+				previewer = true,
 				initial_mode = "insert",
 				path_display = { "tail" },
 
@@ -198,7 +202,7 @@ function M.config()
 
 			oldfiles = {
 				theme = "dropdown",
-				previewer = false,
+				previewer = true,
 			},
 
 			marks = {
@@ -238,34 +242,41 @@ function M.config()
 
 			help_tags = {
 				theme = "dropdown",
+				previewer = true,
 			},
 
 			git_branches = {
 				theme = "dropdown",
+				previewer = true,
 			},
 
 			colorscheme = {
 				theme = "dropdown",
+				previewer = true,
 				enable_preview = true,
 			},
 
 			lsp_references = {
 				theme = "dropdown",
+				previewer = true,
 				initial_mode = "normal",
 			},
 
 			lsp_definitions = {
 				theme = "dropdown",
+				previewer = true,
 				initial_mode = "normal",
 			},
 
 			lsp_declarations = {
 				theme = "dropdown",
+				previewer = true,
 				initial_mode = "normal",
 			},
 
 			lsp_implementations = {
 				theme = "dropdown",
+				previewer = true,
 				initial_mode = "normal",
 			},
 		},
