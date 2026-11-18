@@ -81,7 +81,6 @@ function M.filename_first()
 	})
 end
 
-
 -- live_grep's built-in sorter only highlights matches and gives every result
 -- the same score. Rank the actual matched line instead of the full
 -- "filename:line:column:text" ordinal so paths cannot outrank relevant code.
