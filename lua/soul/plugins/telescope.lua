@@ -139,6 +139,8 @@ function M.config()
 				hidden = true,
 				no_ignore = false,
 				follow = true,
+				-- Prefer a filename match over a directory-name match.
+				sorter = require("soul.core.helpers.telescope_sorter").filename_first(),
 			},
 
 			live_grep = {
