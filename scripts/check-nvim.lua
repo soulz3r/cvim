@@ -466,10 +466,10 @@ assert(
 	"git_files sorter was not passed"
 )
 
-local exact_file = file_sorter.scoring_function(nil, "main", "main.c")
-local prefix_file = file_sorter.scoring_function(nil, "main", "main_old.c")
-local substring_file = file_sorter.scoring_function(nil, "main", "old_main.c")
-local fuzzy_file = file_sorter.scoring_function(nil, "main", "m_a_i_n.c")
+local exact_file = file_sorter.scoring_function(nil, "main.c", "main.c")
+local prefix_file = file_sorter.scoring_function(nil, "main.c", "main.c.old")
+local substring_file = file_sorter.scoring_function(nil, "main.c", "old_main.c")
+local fuzzy_file = file_sorter.scoring_function(nil, "main.c", "m_a_i_n.c")
 assert(
 	exact_file < prefix_file and prefix_file < substring_file and substring_file < fuzzy_file,
 	"File search must rank exact filename, prefix, substring, then fuzzy matches"
