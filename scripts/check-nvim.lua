@@ -382,6 +382,11 @@ for _, name in ipairs(modules) do
 end
 
 local telescope_spec = require("soul.plugins.telescope")
+local blink_spec = require("soul.cmp.blink")
+assert(
+	vim.deep_equal(blink_spec.opts.fuzzy.sorts, { "exact", "score", "sort_text" }),
+	"Blink completion must rank exact matches before fuzzy score"
+)
 assert(
 	package.loaded["soul.core.helpers.fzf_native"] == nil,
 	"Telescope plugin spec must not eagerly load the native build helper"
