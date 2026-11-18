@@ -407,6 +407,9 @@ package.loaded["telescope.algos.fzy"] = {
 	get_score_min = function()
 		return 0
 	end,
+	get_score_max = function()
+		return math.huge
+	end,
 	has_match = function(prompt, candidate)
 		local position = 1
 		for index = 1, #candidate do
