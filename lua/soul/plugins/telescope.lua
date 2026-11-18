@@ -84,6 +84,15 @@ function M.config()
 
 	telescope.setup({
 		defaults = {
+			-- Keep every picker consistent: prompt/results on the left, preview on the right.
+			layout_strategy = "horizontal",
+			layout_config = {
+				width = 0.85,
+				height = 0.8,
+				preview_width = 0.5,
+				prompt_position = "top",
+			},
+
 			history = {
 				path = vim.fn.stdpath("data") .. "/telescope_history",
 				limit = 100,
@@ -157,7 +166,6 @@ function M.config()
 
 		pickers = {
 			find_files = {
-				theme = "dropdown",
 				previewer = true,
 				hidden = true,
 				no_ignore = false,
@@ -165,22 +173,18 @@ function M.config()
 			},
 
 			live_grep = {
-				theme = "dropdown",
 				previewer = true,
 			},
 
 			git_files = {
-				theme = "dropdown",
 				previewer = true,
 			},
 
 			grep_string = {
-				theme = "dropdown",
 				previewer = true,
 			},
 
 			buffers = {
-				theme = "dropdown",
 				previewer = true,
 				initial_mode = "insert",
 				path_display = { "tail" },
@@ -199,12 +203,10 @@ function M.config()
 			},
 
 			oldfiles = {
-				theme = "dropdown",
 				previewer = true,
 			},
 
 			marks = {
-				theme = "dropdown",
 				previewer = true,
 
 				mappings = {
@@ -215,7 +217,6 @@ function M.config()
 			},
 
 			registers = {
-				theme = "dropdown",
 				previewer = true,
 
 				mappings = {
@@ -239,41 +240,34 @@ function M.config()
 			},
 
 			help_tags = {
-				theme = "dropdown",
 				previewer = true,
 			},
 
 			git_branches = {
-				theme = "dropdown",
 				previewer = true,
 			},
 
 			colorscheme = {
-				theme = "dropdown",
 				previewer = true,
 				enable_preview = true,
 			},
 
 			lsp_references = {
-				theme = "dropdown",
 				previewer = true,
 				initial_mode = "normal",
 			},
 
 			lsp_definitions = {
-				theme = "dropdown",
 				previewer = true,
 				initial_mode = "normal",
 			},
 
 			lsp_declarations = {
-				theme = "dropdown",
 				previewer = true,
 				initial_mode = "normal",
 			},
 
 			lsp_implementations = {
-				theme = "dropdown",
 				previewer = true,
 				initial_mode = "normal",
 			},

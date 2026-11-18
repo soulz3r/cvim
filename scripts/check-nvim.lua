@@ -532,6 +532,22 @@ assert(
 )
 
 local telescope_source = table.concat(vim.fn.readfile(root .. "/lua/soul/plugins/telescope.lua"), "\n")
+local live_grep_source = table.concat(vim.fn.readfile(root .. "/lua/soul/core/helpers/telescope_live_grep.lua"), "\n")
+assert(
+	telescope_source:find('layout_strategy = "horizontal"', 1, true)
+		and telescope_source:find('prompt_position = "top"', 1, true)
+		and telescope_source:find("preview_width = 0.5", 1, true),
+	"Telescope must use one shared horizontal layout with a top prompt and right-side preview"
+)
+assert(
+	not telescope_source:find('theme = "dropdown"', 1, true),
+	"Picker-specific dropdown themes must not override the shared Telescope layout"
+)
+assert(
+	not live_grep_source:find("get_window_options", 1, true)
+		and not live_grep_source:find("get_dropdown", 1, true),
+	"Live grep must not retain custom positioning or dropdown overrides"
+)
 assert(telescope_source:find("previewer = true", 1, true), "Telescope searches must explicitly enable preview")
 assert(
 	not telescope_source:find("previewer = false", 1, true) and not telescope_source:find("previewer=false", 1, true),
