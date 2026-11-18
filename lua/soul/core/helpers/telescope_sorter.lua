@@ -30,9 +30,13 @@ local function fuzzy_score(fzy, prompt, candidate)
 		return nil
 	end
 
-	-- fzy scores higher-quality matches higher; Telescope sorts lower scores first.
-	-- Keep fuzzy matches below literal matches with a stable, linear distance.
-	return 2 - score
+	-- Normalize fzy's score into [0, 1]. Without this, weak filename fuzzy
+	-- matches can overlap the directory-match score band.
+	local score_floor = fzy.get_score_floor()
+	local score_ceiling = #prompt + 1
+	local distance = (score_ceiling - score) / (score_ceiling - score_floor)
+
+	return math.max(0, math.min(1, distance))
 end
 
 function M.filename_first()
@@ -70,7 +74,7 @@ function M.filename_first()
 
 			local path_fuzzy = fuzzy_score(fzy, prompt, ordinal)
 			if path_fuzzy ~= nil then
-				return 0.7 + path_fuzzy
+				return 1.5 + path_fuzzy
 			end
 
 			return -1

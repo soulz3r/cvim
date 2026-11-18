@@ -419,7 +419,10 @@ package.loaded["telescope.algos.fzy"] = {
 		end
 		return prompt == ""
 	end,
-	score = function()
+	score = function(_, candidate)
+		if candidate:find("weak", 1, true) then
+			return -99
+		end
 		return 0.5
 	end,
 	positions = function()
@@ -469,7 +472,7 @@ assert(
 local exact_file = file_sorter.scoring_function(nil, "main.c", "main.c")
 local prefix_file = file_sorter.scoring_function(nil, "main.c", "main.c.old")
 local substring_file = file_sorter.scoring_function(nil, "main.c", "old_main.c")
-local fuzzy_file = file_sorter.scoring_function(nil, "main.c", "m_a_i_n.c")
+local fuzzy_file = file_sorter.scoring_function(nil, "main.c", "m_a_i_n.c_weak")
 local path_literal = file_sorter.scoring_function(nil, "main.c", "src/main.c/other.c")
 local fuzzy_path = file_sorter.scoring_function(nil, "main.c", "src/m_a_i_n.c/other.c")
 assert(
