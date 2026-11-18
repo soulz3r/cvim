@@ -41,7 +41,8 @@ function M.dedupe_entry_maker(entry_maker)
 
 		seen[key] = true
 		return entry
-	end, reset
+	end,
+		reset
 end
 
 local function get_open_files()
