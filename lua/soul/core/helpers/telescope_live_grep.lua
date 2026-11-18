@@ -62,16 +62,29 @@ end
 
 function M.open(opts)
 	opts = require("telescope.themes").get_dropdown(opts or {})
-	-- The dropdown's center strategy centers only the prompt/results block and
-	-- puts the preview in the remaining screen space. Use the horizontal
-	-- strategy so prompt, results, and preview form one centered floating box.
-	opts.layout_strategy = "horizontal"
 	opts.layout_config = vim.tbl_deep_extend("force", opts.layout_config or {}, {
 	width = 0.85,
 	height = 0.8,
 	preview_width = 0.5,
 	prompt_position = "top",
 })
+
+	-- Telescope positions floats inside the usable area, excluding cmdheight
+	-- and the statusline. Recenter the complete layout on the editor grid.
+	local strategies = require("telescope.pickers.layout_strategies")
+	opts.layout_strategy = nil
+	opts.get_window_options = function(picker, columns, lines)
+		local layout = strategies.horizontal(picker, columns, lines)
+		local offset = math.floor((vim.o.lines - lines) / 2)
+
+		for _, window in pairs(layout) do
+			if window and window.line then
+				window.line = window.line + offset
+			end
+		end
+
+		return layout
+	end
 
 	local actions = require("telescope.actions")
 	local conf = require("telescope.config").values
