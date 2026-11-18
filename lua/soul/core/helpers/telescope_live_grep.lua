@@ -61,7 +61,7 @@ local function get_open_files()
 end
 
 function M.open(opts)
-	opts = opts or {}
+	opts = require("telescope.themes").get_dropdown(opts or {})
 
 	local actions = require("telescope.actions")
 	local conf = require("telescope.config").values
