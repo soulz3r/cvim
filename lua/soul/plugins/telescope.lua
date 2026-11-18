@@ -5,8 +5,8 @@ local M = {
 	keys = {
 		{ "<leader>fb", "<cmd>Telescope buffers previewer=false<CR>", desc = "Buffers" },
 		{ "<leader>fC", "<cmd>Telescope colorscheme<CR>", desc = "Colorscheme" },
-		{ "<leader>ff", "<cmd>Telescope find_files<CR>", desc = "Find Files" },
-		{ "<leader>ft", "<cmd>Telescope live_grep<CR>", desc = "Live Grep" },
+		{ "<leader>ff", function() require("telescope.builtin").find_files({ sorter = require("soul.core.helpers.telescope_sorter").filename_first() }) end, desc = "Find Files" },
+		{ "<leader>ft", function() require("telescope.builtin").live_grep({ sorter = require("soul.core.helpers.telescope_sorter").live_grep() }) end, desc = "Live Grep" },
 		{ "<leader>fh", "<cmd>Telescope help_tags<CR>", desc = "Help" },
 		{ "<leader>fr", "<cmd>Telescope resume<CR>", desc = "Resume" },
 		{ "<leader>fo", "<cmd>Telescope oldfiles<CR>", desc = "Recent Files" },
@@ -19,7 +19,7 @@ local M = {
 		{ "<leader>fgc", "<cmd>Telescope git_commits<CR>", desc = "Git Commits" },
 		{ "<leader>fgs", "<cmd>Telescope git_status<CR>", desc = "Git Status" },
 		{ "<leader>fgS", "<cmd>Telescope git_stash<CR>", desc = "Git Stash" },
-		{ "<leader>fgf", "<cmd>Telescope git_files<CR>", desc = "Git Files" },
+		{ "<leader>fgf", function() require("telescope.builtin").git_files({ sorter = require("soul.core.helpers.telescope_sorter").filename_first() }) end, desc = "Git Files" },
 		{ "<leader>fgB", "<cmd>Telescope git_bcommits<CR>", desc = "Git Buffer Commits" },
 		{ "<leader>fs", "<cmd>Telescope treesitter<CR>", desc = "Treesitter Symbols" },
 		{ "<leader>fx", "<cmd>Telescope diagnostics<CR>", desc = "Diagnostics" },
@@ -76,7 +76,7 @@ function M.config()
 
 			initial_mode = "insert",
 			selection_strategy = "reset",
-			sorting_strategy = "ascending",
+			sorting_strategy = "descending",
 			scroll_strategy = "cycle",
 
 			path_display = { "tail" },
@@ -139,8 +139,6 @@ function M.config()
 				hidden = true,
 				no_ignore = false,
 				follow = true,
-				-- Prefer a filename match over a directory-name match.
-				sorter = require("soul.core.helpers.telescope_sorter").filename_first(),
 			},
 
 			live_grep = {
@@ -149,7 +147,6 @@ function M.config()
 
 			git_files = {
 				theme = "dropdown",
-				sorter = require("soul.core.helpers.telescope_sorter").filename_first(),
 			},
 
 			grep_string = {
