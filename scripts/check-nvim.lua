@@ -544,8 +544,7 @@ assert(
 	"Picker-specific dropdown themes must not override the shared Telescope layout"
 )
 assert(
-	not live_grep_source:find("get_window_options", 1, true)
-		and not live_grep_source:find("get_dropdown", 1, true),
+	not live_grep_source:find("get_window_options", 1, true) and not live_grep_source:find("get_dropdown", 1, true),
 	"Live grep must not retain custom positioning or dropdown overrides"
 )
 assert(telescope_source:find("previewer = true", 1, true), "Telescope searches must explicitly enable preview")
