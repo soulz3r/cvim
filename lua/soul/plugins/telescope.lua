@@ -147,6 +147,11 @@ function M.config()
 				theme = "dropdown",
 			},
 
+			git_files = {
+				theme = "dropdown",
+				sorter = require("soul.core.helpers.telescope_sorter").filename_first(),
+			},
+
 			grep_string = {
 				theme = "dropdown",
 			},
