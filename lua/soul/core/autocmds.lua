@@ -53,44 +53,17 @@ vim.api.nvim_create_autocmd("CursorHold", {
 	end,
 })
 
--- Open the complete :messages history in the same large centered float style.
-local function show_messages()
-	local messages = vim.api.nvim_exec2("messages", { output = true }).output
-	local lines = vim.split(messages, "\n", { plain = true })
-	if #lines == 0 or (#lines == 1 and lines[1] == "") then
-		lines = { "No messages." }
-	end
-
-	local width = math.max(1, math.min(vim.o.columns - 4, math.floor(vim.o.columns * 0.80)))
-	local height = math.max(1, math.min(vim.o.lines - 4, math.floor(vim.o.lines * 0.70)))
-	local buf = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-	vim.bo[buf].buftype = "nofile"
-	vim.bo[buf].bufhidden = "wipe"
-	vim.bo[buf].swapfile = false
-	vim.bo[buf].modifiable = false
-	vim.bo[buf].filetype = "messages"
-
-	local win = vim.api.nvim_open_win(buf, true, {
-		relative = "editor",
-		style = "minimal",
-		border = "rounded",
-		title = " Messages ",
-		title_pos = "center",
-		width = width,
-		height = height,
-		row = math.max(0, math.floor((vim.o.lines - height) / 2)),
-		col = math.max(0, math.floor((vim.o.columns - width) / 2)),
-	})
-	vim.wo[win].wrap = true
-	vim.wo[win].cursorline = true
-	vim.keymap.set("n", "q", function() vim.api.nvim_win_close(win, true) end, {
-		buffer = buf, silent = true, nowait = true,
-	})
-	vim.keymap.set("n", "<Esc>", function() vim.api.nvim_win_close(win, true) end, {
-		buffer = buf, silent = true, nowait = true,
-	})
-end
-
-vim.api.nvim_create_user_command("Messages", show_messages, {})
-vim.cmd([[cnoreabbrev <expr> messages getcmdtype() == ':' && getcmdline() ==# 'messages' ? 'Messages' : 'messages']])
+-- Give Neovim UI2 message popups the same rounded float treatment as CVIM.
+vim.api.nvim_create_autocmd("FileType", {
+	group = group,
+	pattern = "msg",
+	callback = function()
+		local win = vim.api.nvim_get_current_win()
+		if not vim.api.nvim_win_is_valid(win) then return end
+		local config = vim.api.nvim_win_get_config(win)
+		config.border = "rounded"
+		config.title = " Message "
+		config.title_pos = "left"
+		vim.api.nvim_win_set_config(win, config)
+	end,
+})
