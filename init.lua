@@ -5,7 +5,6 @@ end
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 require("soul.core.options")
-vim.cmd.colorscheme("minmax")
 require("soul.core.autocmds")
 -- Keep native messages in the bottom command area, then clear them after five seconds.
 local ui2 = require("vim._core.ui2")
