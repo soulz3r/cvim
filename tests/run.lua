@@ -81,11 +81,15 @@ test("UI2 remains available on Windows", function()
 	}
 
 	vim.fn.has = function(feature)
-		if feature == "win32" then return 1 end
+		if feature == "win32" then
+			return 1
+		end
 		return original_has(feature)
 	end
 	package.loaded["vim._core.ui2"] = nil
-	package.preload["vim._core.ui2"] = function() return ui2 end
+	package.preload["vim._core.ui2"] = function()
+		return ui2
+	end
 	package.preload["vim._core.ui2.messages"] = function()
 		return { msg_show = function() end, msg_clear = function() end }
 	end
@@ -156,7 +160,9 @@ test("UI2 bottom messages clear after three seconds", function()
 	local clear_calls = 0
 	local message_store = {
 		msg_show = function() end,
-		msg_clear = function() clear_calls = clear_calls + 1 end,
+		msg_clear = function()
+			clear_calls = clear_calls + 1
+		end,
 	}
 	local ui2 = {
 		msg = { msg_show = function() end },
@@ -170,7 +176,9 @@ test("UI2 bottom messages clear after three seconds", function()
 	package.loaded["vim._core.ui2"] = nil
 	package.loaded["vim._core.ui2.messages"] = nil
 	package.preload["vim._core.ui2"] = function() return ui2 end
-	package.preload["vim._core.ui2.messages"] = function() return message_store end
+	package.preload["vim._core.ui2.messages"] = function()
+		return message_store
+	end
 	package.loaded["soul.ui.ui2"] = nil
 
 	local manager = require("soul.ui.ui2")
