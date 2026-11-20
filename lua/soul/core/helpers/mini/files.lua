@@ -2,7 +2,9 @@ local M = {}
 local configured = false
 
 function M.setup()
-  if configured then return end
+  if configured then
+    return
+  end
   local MiniFiles = require("mini.files")
   local show_hidden = false
 
@@ -12,12 +14,17 @@ function M.setup()
 
   local function toggle_hidden()
     show_hidden = not show_hidden
-    MiniFiles.refresh({ content = { filter = show_hidden and function() return true end or filter_hide } })
+    MiniFiles.refresh({ content = { filter = show_hidden and function()
+      return true
+    end or filter_hide } })
   end
 
   MiniFiles.setup({
     mappings = {
-      go_in = "<CR>", go_in_plus = "L", go_out = ",", go_out_plus = "H",
+      go_in = "<CR>",
+      go_in_plus = "L",
+      go_out = ",",
+      go_out_plus = "H",
       synchronize = "<leader>w",
     },
     options = { use_as_default_explorer = true, permanent_delete = false },
@@ -38,7 +45,9 @@ function M.setup()
 
   local function open_entry()
     local entry = MiniFiles.get_fs_entry()
-    if entry and entry.path then vim.ui.open(entry.path) end
+    if entry and entry.path then
+      vim.ui.open(entry.path)
+    end
   end
 
   local group = vim.api.nvim_create_augroup("SoulMiniFiles", { clear = true })

@@ -1,16 +1,22 @@
 local function setup(module)
-  return function() require("soul.core.helpers.mini." .. module).setup() end
+  return function()
+    require("soul.core.helpers.mini." .. module).setup()
+  end
 end
 
 local M = {
   {
     "nvim-mini/mini.files",
     dependencies = { "nvim-mini/mini.icons" },
-    keys = {{
-      "<leader>e",
-      function() require("mini.files").open(vim.fn.getcwd()) end,
-      desc = "Open Mini.files",
-    }},
+    keys = {
+      {
+        "<leader>e",
+        function()
+          require("mini.files").open(vim.fn.getcwd())
+        end,
+        desc = "Open Mini.files",
+      },
+    },
     config = setup("files"),
   },
   { "nvim-mini/mini.icons", event = "VeryLazy", config = setup("icons") },
