@@ -76,7 +76,7 @@ local M = {
                 local bash = git_bash()
                 if bash then
                     -- Explicitly load the user's custom Bash config, regardless of login profiles.
-                    local bashrc = vim.fn.expand("~/.bashrc"):gsub("\\", "/")
+                    local bashrc = "/d/config/bash/.bashrc"
                     local arguments = "--rcfile " .. quote_argument(bashrc) .. " -i"
                     return command_for(bash, arguments)
                 end
