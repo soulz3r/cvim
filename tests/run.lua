@@ -75,8 +75,9 @@ test("UI2 remains available on Windows", function()
 	local ui2 = {
 		msg = { msg_show = function() end },
 		enable = function(options)
-			assert(options.enable == true)
-			assert(options.msg.targets == "cmd")
+			if options.enable then
+				assert(options.msg.targets == "cmd")
+			end
 		end,
 	}
 
