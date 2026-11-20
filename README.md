@@ -2,7 +2,7 @@
 
 A minimal Neovim configuration for Neovim 0.12+.
 
-CVIM keeps native Neovim settings, keymaps, autocmds, a phosphor-green colorscheme, Lazy.nvim, and the Mini.nvim modules.
+CVIM keeps its core editing behavior, UI defaults, diagnostics, messages, keymaps, a phosphor-green colorscheme, Lazy.nvim, and the Mini.nvim modules deliberately separated.
 
 ## Included
 
@@ -12,6 +12,14 @@ CVIM keeps native Neovim settings, keymaps, autocmds, a phosphor-green colorsche
 - Mini.ai, Mini.files, Mini.icons, Mini.pairs, and Mini.surround
 
 Mini.notify is intentionally excluded. Notifications use Neovim's native vim.notify.
+
+## Structure
+
+- `soul.core`: editing options, platform integration, autocmds, and keymaps
+- `soul.ui`: global presentation defaults, diagnostic floats, and message UI
+- `soul.plugins`: plugin specifications and colorscheme loading
+
+Global floating-window and completion-menu borders are configured in `soul.ui.options`. Plugin-specific windows, such as Mini.files and Lazy.nvim, retain their own layout settings. Colors and highlight groups belong to the colorscheme, not the UI behavior modules.
 
 ## Key mappings
 

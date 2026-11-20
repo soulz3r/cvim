@@ -1,5 +1,28 @@
 local M = {}
 
+local function setup_native_messages()
+  -- UI2 is currently the Neovim 0.12 native command-area message frontend.
+  -- Keep this compatibility-sensitive integration isolated in the UI layer.
+  local ui2 = require("vim._core.ui2")
+  ui2.enable({ msg = { targets = "cmd" } })
+
+  local messages = require("vim._core.ui2.messages")
+  local original_msg_show = messages.msg_show
+  local message_generation = 0
+
+  messages.msg_show = function(...)
+    original_msg_show(...)
+    message_generation = message_generation + 1
+    local generation = message_generation
+
+    vim.defer_fn(function()
+      if generation == message_generation then
+        messages.msg_clear()
+      end
+    end, 5000)
+  end
+end
+
 local function open_messages()
   local output = vim.api.nvim_exec2("messages", { output = true }).output
   local lines = vim.split(output, "\n", { plain = true })
@@ -8,8 +31,8 @@ local function open_messages()
     lines = { "No messages." }
   end
 
-  local width = math.min(80, vim.o.columns - 4)
-  local height = math.min(#lines, vim.o.lines - 4)
+  local width = math.max(1, math.min(80, vim.o.columns - 4))
+  local height = math.max(1, math.min(#lines, vim.o.lines - 4))
   local row = math.floor((vim.o.lines - height) / 2) - 1
   local col = math.floor((vim.o.columns - width) / 2)
 
@@ -36,6 +59,8 @@ local function open_messages()
 end
 
 function M.setup()
+  setup_native_messages()
+
   vim.api.nvim_create_user_command("Messages", open_messages, {
     desc = "Show message history in a floating window",
   })
