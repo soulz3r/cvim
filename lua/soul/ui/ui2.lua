@@ -68,7 +68,7 @@ function M.setup()
 				if current_generation == M.message_generation and type(messages.msg_clear) == "function" then
 					messages.msg_clear()
 				end
-			end, 5000)
+			end, 3000)
 		end
 
 		M.messages = messages

@@ -150,6 +150,49 @@ test("UI2 initializes once and restores all handlers", function()
 	assert(message_store.msg_show == original_message_show)
 end)
 
+test("UI2 bottom messages clear after three seconds", function()
+	local original_defer = vim.defer_fn
+	local callbacks, delays = {}, {}
+	local clear_calls = 0
+	local message_store = {
+		msg_show = function() end,
+		msg_clear = function() clear_calls = clear_calls + 1 end,
+	}
+	local ui2 = {
+		msg = { msg_show = function() end },
+		enable = function() end,
+	}
+
+	vim.defer_fn = function(callback, delay)
+		table.insert(callbacks, callback)
+		table.insert(delays, delay)
+	end
+	package.loaded["vim._core.ui2"] = nil
+	package.loaded["vim._core.ui2.messages"] = nil
+	package.preload["vim._core.ui2"] = function() return ui2 end
+	package.preload["vim._core.ui2.messages"] = function() return message_store end
+	package.loaded["soul.ui.ui2"] = nil
+
+	local manager = require("soul.ui.ui2")
+	assert(manager.setup())
+	message_store.msg_show("first")
+	message_store.msg_show("second")
+	assert(delays[1] == 3000 and delays[2] == 3000)
+
+	callbacks[1]()
+	assert(clear_calls == 0, "an older timer must not clear a newer message")
+	callbacks[2]()
+	assert(clear_calls == 1, "the latest message should clear after three seconds")
+
+	assert(manager.restore())
+	vim.defer_fn = original_defer
+	package.preload["vim._core.ui2"] = nil
+	package.preload["vim._core.ui2.messages"] = nil
+	package.loaded["vim._core.ui2"] = nil
+	package.loaded["vim._core.ui2.messages"] = nil
+	package.loaded["soul.ui.ui2"] = nil
+end)
+
 test("Tiny-cmdline failure rolls UI2 back to native mode", function()
 	local manager = require("soul.ui.ui2")
 	local tiny = require("soul.plugins.tiny_cmdline")
