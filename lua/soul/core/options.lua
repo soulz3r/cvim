@@ -1,6 +1,7 @@
 vim.opt.backup = false
 -- Native command line stays available unless the optional UI2 frontend loads.
 vim.opt.cmdheight = 1
+vim.cmd("set messagesopt+=timeout:5000")
 vim.opt.report = 9999
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
 vim.opt.conceallevel = 0
