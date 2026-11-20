@@ -32,3 +32,16 @@ vim.opt.fillchars:append({
 
 -- Neovim 0.12 global defaults: no floating-window frame or added padding.
 vim.opt.winborder = "none"
+
+-- Keep theme text colors, but never tint the border chrome.
+local function clear_border_highlights()
+  vim.api.nvim_set_hl(0, "FloatBorder", { fg = "NONE", bg = "NONE" })
+  vim.api.nvim_set_hl(0, "PmenuBorder", { fg = "NONE", bg = "NONE" })
+end
+
+local group = vim.api.nvim_create_augroup("CVIMUIHighlights", { clear = true })
+vim.api.nvim_create_autocmd("ColorScheme", {
+  group = group,
+  callback = clear_border_highlights,
+})
+clear_border_highlights()
