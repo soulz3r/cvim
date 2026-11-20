@@ -175,7 +175,9 @@ test("UI2 bottom messages clear after three seconds", function()
 	end
 	package.loaded["vim._core.ui2"] = nil
 	package.loaded["vim._core.ui2.messages"] = nil
-	package.preload["vim._core.ui2"] = function() return ui2 end
+	package.preload["vim._core.ui2"] = function()
+		return ui2
+	end
 	package.preload["vim._core.ui2.messages"] = function()
 		return message_store
 	end
