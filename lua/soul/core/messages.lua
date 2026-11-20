@@ -48,6 +48,7 @@ function M.setup()
     return "<CR>"
   end, {
     expr = true,
+    noremap = true,
     desc = "Open message history in a floating window",
   })
 end
