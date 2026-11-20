@@ -30,15 +30,34 @@ vim.opt.fillchars:append({
   stl = " ",
 })
 
--- Keep a real outline without adding a solid border-padding area.
+-- Keep rounded outlines, but never paint the area behind the outline.
 vim.opt.winborder = "rounded"
 
--- Reuse the colorscheme's border foreground for completion-menu borders.
+local border_backgrounds = {
+  "FloatBorder",
+  "PmenuBorder",
+  "NormalFloat",
+  "Pmenu",
+  "FloatTitle",
+  "FloatFooter",
+}
+
+local function clear_border_backgrounds()
+  for _, name in ipairs(border_backgrounds) do
+    local highlights = vim.api.nvim_get_hl(0, {
+      name = name,
+      link = false,
+    })
+
+    highlights.bg = "NONE"
+    vim.api.nvim_set_hl(0, name, highlights)
+  end
+end
+
 local group = vim.api.nvim_create_augroup("CVIMUIHighlights", { clear = true })
 vim.api.nvim_create_autocmd("ColorScheme", {
   group = group,
-  callback = function()
-    vim.api.nvim_set_hl(0, "PmenuBorder", { link = "FloatBorder" })
-  end,
+  callback = clear_border_backgrounds,
 })
-vim.api.nvim_set_hl(0, "PmenuBorder", { link = "FloatBorder" })
+
+clear_border_backgrounds()
