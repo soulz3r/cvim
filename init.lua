@@ -26,6 +26,7 @@ messages.msg_show = function(...)
 		end
 	end, 5000)
 end
+require("soul.core.messages").setup()
 require("soul.core.keymaps")
 require("soul.lazy")
 vim.g.cvim_config_loaded = true
