@@ -7,6 +7,7 @@ vim.g.maplocalleader = " "
 require("soul.core.options")
 vim.cmd.colorscheme("minmax")
 require("soul.core.autocmds")
+require("vim._core.ui2").enable({ msg = { targets = "msg" } })
 require("soul.core.keymaps")
 require("soul.lazy")
 vim.g.cvim_config_loaded = true
