@@ -53,58 +53,85 @@ vim.api.nvim_create_autocmd("CursorHold", {
 	end,
 })
 
--- Show only the latest :messages entry in a temporary floating window.
+-- Display the latest editor message in a persistent floating window.
+-- A new message replaces the previous one; no timer hides it.
 local message_win
+local message_buf
 
-local function show_messages()
-	local output = vim.api.nvim_exec2("messages", { output = true }).output
-	local lines = vim.split(output, "\n", { plain = true })
-	local message
-
-	for i = #lines, 1, -1 do
-		local line = vim.trim(lines[i])
-		if line ~= "" then
-			message = line
-			break
+local function message_text(content)
+	local parts = {}
+	for _, chunk in ipairs(content or {}) do
+		if type(chunk) == "table" and type(chunk[2]) == "string" then
+			parts[#parts + 1] = chunk[2]
 		end
 	end
+	return vim.trim(table.concat(parts))
+end
 
-	if not message then
-		message = "No messages."
+local function show_message(message)
+	if message == "" then
+		return
 	end
 
-	if message_win and vim.api.nvim_win_is_valid(message_win) then
-		vim.api.nvim_win_close(message_win, true)
+	local lines = vim.split(message, "\n", { plain = true })
+	local width = math.max(1, math.min(
+		math.floor(vim.o.columns * 0.80),
+		math.max(24, math.min(vim.fn.strdisplaywidth(message) + 2, vim.o.columns - 4))
+	))
+	local height = math.max(1, math.min(#lines, 5))
+
+	if not message_buf or not vim.api.nvim_buf_is_valid(message_buf) then
+		message_buf = vim.api.nvim_create_buf(false, true)
+		vim.bo[message_buf].buftype = "nofile"
+		vim.bo[message_buf].bufhidden = "hide"
+		vim.bo[message_buf].swapfile = false
 	end
 
-	local max_width = math.max(1, math.floor(vim.o.columns * 0.80))
-	local width = math.min(max_width, math.max(24, #message + 2))
-	local buf = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, { message })
-	vim.bo[buf].buftype = "nofile"
-	vim.bo[buf].bufhidden = "wipe"
-	vim.bo[buf].swapfile = false
-	vim.bo[buf].modifiable = false
+	vim.bo[message_buf].modifiable = true
+	vim.api.nvim_buf_set_lines(message_buf, 0, -1, false, lines)
+	vim.bo[message_buf].modifiable = false
 
-	message_win = vim.api.nvim_open_win(buf, false, {
+	local config = {
 		relative = "editor",
 		style = "minimal",
 		border = "rounded",
 		width = width,
-		height = 1,
-		row = math.max(0, math.floor((vim.o.lines - 3) / 2)),
-		col = math.max(0, math.floor((vim.o.columns - width) / 2)),
-	})
+		height = height,
+		row = math.max(0, vim.o.lines - height - 3),
+		col = math.max(0, vim.o.columns - width - 2),
+	}
+	if message_win and vim.api.nvim_win_is_valid(message_win) then
+		vim.api.nvim_win_set_config(message_win, config)
+	else
+		message_win = vim.api.nvim_open_win(message_buf, false, config)
+	end
 	vim.wo[message_win].wrap = true
-
-	local win = message_win
-	vim.defer_fn(function()
-		if message_win == win and vim.api.nvim_win_is_valid(win) then
-			vim.api.nvim_win_close(win, true)
-			message_win = nil
-		end
-	end, 2500)
+	vim.wo[message_win].winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder"
 end
 
-vim.api.nvim_create_user_command("Messages", show_messages, {})
-vim.cmd([[cnoreabbrev <expr> messages getcmdtype() == ':' && getcmdline() ==# 'messages' ? 'Messages' : 'messages']])
+local message_ns = vim.api.nvim_create_namespace("cvim_messages")
+vim.ui_attach(message_ns, { ext_messages = true, set_cmdheight = false }, function(event, ...)
+	local args = { ... }
+
+	if event == "msg_show" then
+		local _, content = args[1], args[2]
+		local message = message_text(content)
+		if message ~= "" then
+			vim.schedule(function() show_message(message) end)
+		end
+		return true
+	elseif event == "msg_history_show" then
+		local entries = args[1] or {}
+		local latest
+		for i = #entries, 1, -1 do
+			latest = message_text(entries[i][2])
+			if latest ~= "" then
+				break
+			end
+		end
+		if latest and latest ~= "" then
+			vim.schedule(function() show_message(latest) end)
+		end
+		return true
+	end
+end)
