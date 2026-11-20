@@ -36,6 +36,7 @@ function M.setup()
   require("lazy").setup({
     spec = { { import = "soul.plugins" } },
     rocks = { enabled = false, hererocks = false },
+    install = { colorscheme = { "minmax", "default" } },
     ui = { border = "rounded" },
     change_detection = { enabled = true, notify = false },
   })
