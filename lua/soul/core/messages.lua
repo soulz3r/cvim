@@ -40,11 +40,16 @@ function M.setup()
     desc = "Show message history in a floating window",
   })
 
-  vim.cmd([[
-    cnoreabbrev <expr> messages
-      getcmdtype() ==# ':' && getcmdline() ==# 'messages'
-      ? 'Messages' : 'messages'
-  ]])
+  vim.keymap.set("c", "<CR>", function()
+    if vim.fn.getcmdtype() == ":" and vim.fn.getcmdline() == "messages" then
+      return "<C-u>Messages<CR>"
+    end
+
+    return "<CR>"
+  end, {
+    expr = true,
+    desc = "Open message history in a floating window",
+  })
 end
 
 return M
