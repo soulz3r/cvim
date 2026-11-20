@@ -10,6 +10,7 @@ CVIM keeps core editing behavior, UI settings, diagnostics, messages, keymaps, t
 - Minmax green terminal-style colorscheme
 - Lazy.nvim with automatic bootstrap
 - Mini.ai, Mini.files, Mini.icons, Mini.pairs, and Mini.surround
+- Eyeliner for subtle character-jump hints
 - Telescope for file finding, live grep, buffers, and help
 - ToggleTerm with a floating terminal, using Git Bash on Windows and explicitly loading `D:/config/bash/.bashrc`, with `pwsh` and Windows PowerShell fallbacks
 - Tiny-cmdline with Neovim's built-in command-line completion and Neovim 0.12 UI2 support on non-Windows platforms; Windows uses the native command line
