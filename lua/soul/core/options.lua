@@ -63,7 +63,7 @@ vim.opt.fillchars:append({
 	stl = " ",
 })
 
-vim.opt.shortmess:append("cu")
+vim.cmd("set shortmess+=cu")
 
 -- Core options should not import a helper used by optional floating UIs.
 vim.opt.winborder = "rounded"
