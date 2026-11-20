@@ -10,7 +10,7 @@ CVIM keeps core editing behavior, UI settings, diagnostics, messages, keymaps, t
 - Minmax green terminal-style colorscheme
 - Lazy.nvim with automatic bootstrap
 - Mini.ai, Mini.files, Mini.icons, Mini.pairs, and Mini.surround
-- Tiny-cmdline with Blink's reposition adapter and Neovim 0.12 UI2 support
+- Tiny-cmdline with Blink's reposition adapter and Neovim 0.12 UI2 support on non-Windows platforms; Windows uses the native command line
 
 Tiny-cmdline is optional at startup. CVIM initializes UI2 once through `soul.ui.ui2`. If UI2 is unavailable or Tiny-cmdline setup fails, CVIM restores the native command line, restores the original UI2 message handlers, and explicitly disables UI2.
 

@@ -70,6 +70,25 @@ test("plugin specifications and lockfile agree", function()
 	assert(lockfile["tiny-cmdline.nvim"] and lockfile["blink.cmp"])
 end)
 
+test("Windows keeps the native command line instead of enabling UI2", function()
+	local original_has = vim.fn.has
+	vim.fn.has = function(feature)
+		if feature == "win32" then return 1 end
+		return original_has(feature)
+	end
+
+	package.loaded["soul.ui.ui2"] = nil
+	local manager = require("soul.ui.ui2")
+	local enabled, err = manager.setup()
+
+	assert(not enabled)
+	assert(err:find("disabled on Windows", 1, true))
+	assert(manager.is_enabled() == false)
+
+	vim.fn.has = original_has
+	package.loaded["soul.ui.ui2"] = nil
+end)
+
 test("UI2 initializes once and restores all handlers", function()
 	local enable_calls = 0
 	local disable_calls = 0

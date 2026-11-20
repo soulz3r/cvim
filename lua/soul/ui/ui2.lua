@@ -3,6 +3,12 @@ local M = {
 }
 
 local function get_ui2()
+	-- UI2 currently breaks command-line input on the Windows setup.
+	-- Keep the native command line there until Neovim's UI2 path is reliable.
+	if vim.fn.has("win32") == 1 then
+		return nil, "UI2 is disabled on Windows; using Neovim's native command line"
+	end
+
 	if vim.fn.has("nvim-0.12") ~= 1 then
 		return nil, "Neovim 0.12 or newer is required"
 	end
