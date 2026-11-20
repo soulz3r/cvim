@@ -43,27 +43,42 @@ local M = {
                 end
             end
 
+            local function is_powershell_host()
+                local shell = vim.o.shell:lower():gsub("\\", "/")
+                return shell:find("pwsh", 1, true) ~= nil
+                    or shell:find("powershell", 1, true) ~= nil
+            end
+
+            -- ToggleTerm expects shell to be a command string, not an executable plus args.
+            local function command_for(executable, arguments)
+                if is_powershell_host() then
+                    local quoted = "'" .. executable:gsub("'", "''") .. "'"
+                    return "& " .. quoted .. " " .. arguments
+                end
+
+                local quoted = '"' .. executable:gsub('"', '\\" ') .. '"'
+                return quoted .. " " .. arguments
+            end
+
             local function resolve_shell()
                 if vim.fn.has("win32") ~= 1 then
-                    return vim.o.shell, {}
+                    return vim.o.shell
                 end
 
                 local bash = git_bash()
                 if bash then
-                    return bash, { "--login", "-i" }
+                    return command_for(bash, "--login -i")
                 end
 
                 for _, candidate in ipairs({ "pwsh.exe", "pwsh", "powershell.exe", "powershell" }) do
                     local shell = vim.fn.exepath(candidate)
                     if shell ~= "" then
-                        return shell, { "-NoLogo" }
+                        return command_for(shell, "-NoLogo -NoExit")
                     end
                 end
 
-                return vim.o.shell, {}
+                return vim.o.shell
             end
-
-            local shell, shell_args = resolve_shell()
 
             require("toggleterm").setup({
                 size = 15,
@@ -76,8 +91,7 @@ local M = {
                 persist_mode = true,
                 close_on_exit = true,
                 shade_terminals = false,
-                shell = shell,
-                shell_args = shell_args,
+                shell = resolve_shell(),
             })
         end,
     },
