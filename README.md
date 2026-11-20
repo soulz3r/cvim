@@ -10,6 +10,7 @@ CVIM keeps core editing behavior, UI settings, diagnostics, messages, keymaps, t
 - Minmax green terminal-style colorscheme
 - Lazy.nvim with automatic bootstrap
 - Mini.ai, Mini.files, Mini.icons, Mini.pairs, and Mini.surround
+- ToggleTerm with a horizontal terminal, using Git Bash on Windows with `pwsh` and Windows PowerShell fallbacks
 - Tiny-cmdline with Neovim's built-in command-line completion and Neovim 0.12 UI2 support on non-Windows platforms; Windows uses the native command line
 
 Tiny-cmdline is optional at startup. CVIM initializes UI2 once through `soul.ui.ui2`. If UI2 is unavailable or Tiny-cmdline setup fails, CVIM restores the native command line, restores the original UI2 message handlers, and explicitly disables UI2.
@@ -51,6 +52,7 @@ No separate documentation directory is needed for this configuration. The README
 |---|---|
 | <leader>e | Open Mini.files |
 | <leader>L | Open Lazy.nvim |
+| Ctrl+\\ | Toggle the terminal |
 | ,, | Exit insert/visual mode; clear search in normal mode |
 
 Inside Mini.files, `g.` toggles hidden files, `g~` changes the working directory, and `gx` opens the selected entry with the system application.
