@@ -35,7 +35,7 @@ vim.opt.relativenumber = true
 vim.opt.numberwidth = 2
 vim.opt.signcolumn = "yes"
 
-vim.opt.laststatus = 3
+vim.opt.laststatus = 0
 
 vim.opt.showcmd = false
 vim.opt.ruler = false

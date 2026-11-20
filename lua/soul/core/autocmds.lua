@@ -22,3 +22,33 @@ vim.api.nvim_create_autocmd("FileType", {
 		})
 	end,
 })
+
+-- Show diagnostics in a compact floating window when the cursor rests on an error.
+vim.diagnostic.config({
+	virtual_text = false,
+	float = {
+		border = "single",
+		source = "if_many",
+		header = "",
+		prefix = "",
+	},
+})
+
+vim.api.nvim_create_autocmd("CursorHold", {
+	group = group,
+	callback = function()
+		local diagnostics = vim.diagnostic.get(0, {
+			lnum = vim.api.nvim_win_get_cursor(0)[1] - 1,
+			severity = vim.diagnostic.severity.ERROR,
+		})
+		if #diagnostics > 0 then
+			vim.diagnostic.open_float(0, {
+				focus = false,
+				scope = "cursor",
+				severity = vim.diagnostic.severity.ERROR,
+				border = "single",
+				source = "if_many",
+			})
+		end
+	end,
+})
