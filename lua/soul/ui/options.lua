@@ -24,6 +24,7 @@ function M.setup()
   vim.opt.fillchars=vim.opt.fillchars+"eob: "
   vim.opt.fillchars:append({stl=" "})
   vim.opt.winborder="rounded"
+  vim.g.health={style="float"}
   local border_backgrounds={"FloatBorder","PmenuBorder","NormalFloat","Pmenu","FloatTitle","FloatFooter"}
   local function clear_border_backgrounds()
     for _,name in ipairs(border_backgrounds) do

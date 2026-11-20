@@ -73,13 +73,8 @@ local function run_buffer_command(command_line, title)
 
   local scratch = vim.api.nvim_create_buf(false, true)
   local ok, temp_win = pcall(vim.api.nvim_open_win, scratch, false, {
-    relative = "editor",
-    row = vim.o.lines + 10,
-    col = 0,
-    width = 1,
-    height = 1,
-    style = "minimal",
-    focusable = true,
+    relative = "editor", row = vim.o.lines + 10, col = 0,
+    width = 1, height = 1, style = "minimal", focusable = true,
   })
   if not ok then
     vim.api.nvim_buf_delete(scratch, { force = true })
@@ -90,10 +85,7 @@ local function run_buffer_command(command_line, title)
   local ran, result = pcall(vim.api.nvim_win_call, temp_win, function()
     vim.cmd(command_line)
     local buf = vim.api.nvim_get_current_buf()
-    return {
-      lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false),
-      filetype = vim.bo[buf].filetype,
-    }
+    return { lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false), filetype = vim.bo[buf].filetype }
   end)
 
   for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -101,23 +93,15 @@ local function run_buffer_command(command_line, title)
       pcall(vim.api.nvim_win_close, win, true)
     end
   end
-  if vim.api.nvim_win_is_valid(temp_win) then
-    pcall(vim.api.nvim_win_close, temp_win, true)
-  end
-  if vim.api.nvim_buf_is_valid(scratch) then
-    pcall(vim.api.nvim_buf_delete, scratch, { force = true })
-  end
+  if vim.api.nvim_win_is_valid(temp_win) then pcall(vim.api.nvim_win_close, temp_win, true) end
+  if vim.api.nvim_buf_is_valid(scratch) then pcall(vim.api.nvim_buf_delete, scratch, { force = true }) end
 
   if not ran then
     vim.notify(tostring(result), vim.log.levels.ERROR)
     return
   end
-  if vim.api.nvim_tabpage_is_valid(original_tab) then
-    pcall(vim.api.nvim_set_current_tabpage, original_tab)
-  end
-  if vim.api.nvim_win_is_valid(original_win) then
-    pcall(vim.api.nvim_set_current_win, original_win)
-  end
+  if vim.api.nvim_tabpage_is_valid(original_tab) then pcall(vim.api.nvim_set_current_tabpage, original_tab) end
+  if vim.api.nvim_win_is_valid(original_win) then pcall(vim.api.nvim_set_current_win, original_win) end
   M.open_output(title, result.lines, result.filetype)
 end
 
@@ -132,8 +116,8 @@ local function handle_command(command_line)
   end
   local command = parsed.cmd:lower()
   local args = parsed.args or {}
-  if command == "checkhealth" or command == "help" or command == "h" or command == "man" then
-    local title = command == "checkhealth" and "Checkhealth" or (command == "man" and "Man" or "Help")
+  if command == "help" or command == "h" or command == "man" then
+    local title = command == "man" and "Man" or "Help"
     vim.schedule(function() run_buffer_command(command_line, title) end)
     return true
   end

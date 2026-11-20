@@ -24,7 +24,8 @@ CVIM uses a transparent UI with visible, rounded borders:
 - Border foregrounds come from the active colorscheme and remain visible.
 - Border, float, title, footer, and popup backgrounds are forced to NONE, preventing a colored strip or halo around the outline.
 - Popup blending is disabled; completion selection colors and syntax highlighting remain intact.
-- Messages, command listings, health reports, help pages, and other supported read-only output open in a centered floating window.
+- Neovim's native `:checkhealth` uses its built-in floating style, so the health buffer is never opened in the editor first.
+- Messages, command listings, help pages, and other supported read-only output open in a centered floating window.
 - Supported output includes mapping listings, registers, highlights, marks, jumps, changes, digraphs, script names, version, buffers, history, and autocmd listings.
 - Commands that modify mappings, options, files, or editor state keep their normal behavior.
 - CVIM-owned floating layouts avoid unnecessary outer spacing; plugin-owned layouts keep their own sizing where required.
