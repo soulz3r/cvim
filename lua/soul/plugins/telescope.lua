@@ -10,7 +10,17 @@ local M = {
             { "<leader>fh", "<cmd>Telescope help_tags<CR>", desc = "Help tags" },
         },
         config = function()
-            require("telescope").setup({})
+            local actions = require("telescope.actions")
+
+            require("telescope").setup({
+                defaults = {
+                    mappings = {
+                        n = {
+                            ["q"] = actions.close,
+                        },
+                    },
+                },
+            })
         end,
     },
 }
