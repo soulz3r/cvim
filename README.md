@@ -24,8 +24,9 @@ CVIM uses a transparent UI with visible, rounded borders:
 - Border foregrounds come from the active colorscheme and remain visible.
 - Border, float, title, footer, and popup backgrounds are forced to NONE, preventing a colored strip or halo around the outline.
 - Popup blending is disabled; completion selection colors and syntax highlighting remain intact.
-- The Messages history opens in a centered, compact window with a titled rounded border.
-- Read-only inspection output such as nmap, vmap, scriptnames, and registers opens in the same floating-window style.
+- Messages, command listings, health reports, help pages, and other supported read-only output open in a centered floating window.
+- Supported output includes mapping listings, registers, highlights, marks, jumps, changes, digraphs, script names, version, buffers, history, and autocmd listings.
+- Commands that modify mappings, options, files, or editor state keep their normal behavior.
 - CVIM-owned floating layouts avoid unnecessary outer spacing; plugin-owned layouts keep their own sizing where required.
 
 Neovim does not provide one global margin or padding option for every window.
