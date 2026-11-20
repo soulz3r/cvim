@@ -11,15 +11,6 @@ local function test(name, callback)
 	print("PASS: " .. name)
 end
 
-local function mock_non_windows()
-	local original_has = vim.fn.has
-	vim.fn.has = function(feature)
-		if feature == "win32" then return 0 end
-		return original_has(feature)
-	end
-	return function() vim.fn.has = original_has end
-end
-
 test("all Lua files parse", function()
 	local files = vim.fn.glob(root .. "/**/*.lua", false, true)
 	table.insert(files, root .. "/init.lua")
@@ -83,29 +74,42 @@ test("plugin specifications and lockfile agree", function()
 	assert(lockfile["tiny-cmdline.nvim"] and lockfile["toggleterm.nvim"] and not lockfile["blink.cmp"])
 end)
 
-test("UI2 stays disabled on Windows", function()
+test("UI2 remains available on Windows", function()
 	local original_has = vim.fn.has
+	local ui2 = {
+		msg = { msg_show = function() end },
+		enable = function() end,
+	}
+	local message_store = {
+		msg_show = function() end,
+		msg_clear = function() end,
+	}
+
 	vim.fn.has = function(feature)
-		if feature == "win32" then
-			return 1
-		end
+		if feature == "win32" then return 1 end
 		return original_has(feature)
 	end
-
+	package.loaded["vim._core.ui2"] = nil
+	package.loaded["vim._core.ui2.messages"] = nil
+	package.preload["vim._core.ui2"] = function() return ui2 end
+	package.preload["vim._core.ui2.messages"] = function() return message_store end
 	package.loaded["soul.ui.ui2"] = nil
-	local manager = require("soul.ui.ui2")
-	local enabled, err = manager.setup()
 
-	assert(not enabled)
-	assert(not manager.is_enabled())
-	assert(err:find("disabled on Windows", 1, true))
+	local manager = require("soul.ui.ui2")
+	assert(manager.available())
+	assert(manager.setup())
+	assert(manager.is_enabled())
+	assert(manager.restore())
 
 	vim.fn.has = original_has
+	package.preload["vim._core.ui2"] = nil
+	package.preload["vim._core.ui2.messages"] = nil
+	package.loaded["vim._core.ui2"] = nil
+	package.loaded["vim._core.ui2.messages"] = nil
 	package.loaded["soul.ui.ui2"] = nil
 end)
 
 test("UI2 initializes once and restores all handlers", function()
-	local restore_platform = mock_non_windows()
 	local enable_calls = 0
 	local disable_calls = 0
 	local original_ui2_show = function() end
@@ -149,11 +153,9 @@ test("UI2 initializes once and restores all handlers", function()
 	assert(disable_calls == 1)
 	assert(ui2.msg.msg_show == original_ui2_show)
 	assert(message_store.msg_show == original_message_show)
-	restore_platform()
 end)
 
 test("UI2 messages use severity-based timeouts", function()
-	local restore_platform = mock_non_windows()
 	local original_defer = vim.defer_fn
 	local callbacks, delays = {}, {}
 	local clear_calls = 0
@@ -207,11 +209,9 @@ test("UI2 messages use severity-based timeouts", function()
 	package.loaded["vim._core.ui2"] = nil
 	package.loaded["vim._core.ui2.messages"] = nil
 	package.loaded["soul.ui.ui2"] = nil
-	restore_platform()
 end)
 
 test("Tiny-cmdline failure rolls UI2 back to native mode", function()
-	local restore_platform = mock_non_windows()
 	local manager = require("soul.ui.ui2")
 	package.loaded["soul.plugins.tiny_cmdline"] = nil
 	local tiny = require("soul.plugins.tiny_cmdline")
@@ -239,7 +239,6 @@ test("Tiny-cmdline failure rolls UI2 back to native mode", function()
 	assert(notifications[1]:find("native command line", 1, true))
 	vim.notify = original_notify
 	package.preload["tiny-cmdline"] = nil
-	restore_platform()
 end)
 
 test("health float interception applies shared geometry and restores API", function()
