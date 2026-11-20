@@ -56,7 +56,7 @@ local output_commands = {
   digraphs = { min = 0, max = 1 }, version = { min = 0, max = 0 },
   ls = { min = 0, max = 0 }, files = { min = 0, max = 0 },
   buffers = { min = 0, max = 0 }, history = { min = 0, max = 1 },
-  autocmd = { min = 0, max = 2 }, messages = { min = 0, max = 0 },
+  autocmd = { min = 0, max = 2 },
 }
 
 local function parse_command(command_line)
@@ -124,7 +124,9 @@ function M.setup()
   vim.keymap.set("c", "<CR>", function()
     if vim.fn.getcmdtype() ~= ":" then return "<CR>" end
     local command_line = vim.fn.getcmdline()
-    if vim.trim(command_line) == "" then return "<CR>" end
+    local trimmed = vim.trim(command_line)
+    if trimmed == "" then return "<CR>" end
+    if trimmed:lower() == "messages" then return "<C-u>Messages<CR>" end
     if handle_command(command_line) then return "<C-c>" end
     return "<CR>"
   end, {
