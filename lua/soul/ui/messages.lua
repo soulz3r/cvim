@@ -204,7 +204,6 @@ function M.setup()
   local ui2 = require("soul.ui.ui2")
   local enabled, err = ui2.setup()
   if not enabled then
-    vim.o.cmdheight = 1
     vim.notify("Neovim UI2 is unavailable; using native messages.\n" .. tostring(err), vim.log.levels.WARN)
   end
 

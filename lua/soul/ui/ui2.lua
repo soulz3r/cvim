@@ -51,23 +51,6 @@ local message_timeouts = {
 	list_cmd = false,
 }
 
-local message_timeouts = {
-	emsg = 6000,
-	lua_error = 6000,
-	echoerr = 6000,
-	rpc_error = 6000,
-	shell_err = 4000,
-	wmsg = 4000,
-	echo = 2000,
-	echomsg = 2000,
-	quickfix = 2000,
-	search_count = 2000,
-	return_prompt = false,
-	confirm = false,
-	input = false,
-	list_cmd = false,
-}
-
 function M.setup()
 	if M.enabled then
 		return true
@@ -98,9 +81,13 @@ function M.setup()
 			M.message_generation = M.message_generation + 1
 			local current_generation = M.message_generation
 			local timeout = message_timeouts[kind]
-			if timeout == nil then timeout = 2000 end
+			if timeout == nil then
+				timeout = 2000
+			end
 
-			if timeout == false then return end
+			if timeout == false then
+				return
+			end
 
 			vim.defer_fn(function()
 				if current_generation == M.message_generation and type(messages.msg_clear) == "function" then

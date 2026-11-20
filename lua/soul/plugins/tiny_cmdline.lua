@@ -8,7 +8,7 @@ local M = {
 
 function M.config()
 	if not ui2.is_enabled() then
-		vim.o.cmdheight = 1
+		vim.o.cmdheight = 0
 		return
 	end
 
@@ -29,7 +29,7 @@ function M.config()
 
 	if not ok then
 		local restored, restore_error = ui2.restore()
-		vim.o.cmdheight = 1
+		vim.o.cmdheight = 0
 
 		local message = "tiny-cmdline/UI2 setup failed; using Neovim's native command line.\n" .. tostring(err)
 		if not restored then

@@ -32,6 +32,7 @@ test("core and UI setup", function()
 	require("soul.ui.diagnostics").setup()
 
 	assert(vim.o.expandtab)
+	assert(vim.o.cmdheight == 0)
 	assert(vim.o.shiftwidth == 2)
 	assert(vim.o.winborder == "rounded")
 	assert(vim.o.pumblend == 0)
@@ -234,7 +235,7 @@ test("Tiny-cmdline failure rolls UI2 back to native mode", function()
 	tiny.config()
 
 	assert(manager.is_enabled() == false)
-	assert(vim.o.cmdheight == 1)
+	assert(vim.o.cmdheight == 0)
 	assert(#notifications == 1)
 	assert(notifications[1]:find("native command line", 1, true))
 	vim.notify = original_notify
