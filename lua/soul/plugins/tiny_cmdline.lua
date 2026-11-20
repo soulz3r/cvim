@@ -3,7 +3,6 @@ local ui2 = require("soul.ui.ui2")
 local M = {
 	"rachartier/tiny-cmdline.nvim",
 	event = "VeryLazy",
-	dependencies = { "saghen/blink.cmp" },
 	cond = ui2.is_enabled,
 }
 
@@ -23,7 +22,6 @@ function M.config()
 
 		local tiny_cmdline = require("tiny-cmdline")
 		tiny_cmdline.setup({
-			on_reposition = tiny_cmdline.adapters.blink,
 			width = { value = "60%", min = 40, max = 100 },
 			native_types = {},
 		})

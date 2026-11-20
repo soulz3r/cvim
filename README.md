@@ -10,7 +10,7 @@ CVIM keeps core editing behavior, UI settings, diagnostics, messages, keymaps, t
 - Minmax green terminal-style colorscheme
 - Lazy.nvim with automatic bootstrap
 - Mini.ai, Mini.files, Mini.icons, Mini.pairs, and Mini.surround
-- Tiny-cmdline with Blink's reposition adapter and Neovim 0.12 UI2 support on non-Windows platforms; Windows uses the native command line
+- Tiny-cmdline with Neovim's built-in command-line completion and Neovim 0.12 UI2 support on non-Windows platforms; Windows uses the native command line
 
 Tiny-cmdline is optional at startup. CVIM initializes UI2 once through `soul.ui.ui2`. If UI2 is unavailable or Tiny-cmdline setup fails, CVIM restores the native command line, restores the original UI2 message handlers, and explicitly disables UI2.
 
@@ -20,10 +20,10 @@ Mini.notify is intentionally excluded. Error and warning messages use native not
 
 CVIM uses a transparent UI with visible, rounded borders:
 
-- Floating windows, diagnostics, completion menus, and Lazy.nvim use rounded borders.
+- Floating windows, diagnostics, popup menus, and Lazy.nvim use rounded borders.
 - Border foregrounds come from the active colorscheme and remain visible.
 - Border, float, title, footer, and popup backgrounds are forced to NONE, preventing a colored strip or halo around the outline.
-- Popup blending is disabled; completion selection colors and syntax highlighting remain intact.
+- Popup blending is disabled; selection colors and syntax highlighting remain intact.
 - Neovim's native `:checkhealth` uses its built-in floating style, with its preview dimensions configured before the float is created.
 - Messages, command listings, help pages, and other supported read-only output open in a centered floating window.
 - Supported output includes mapping listings, registers, highlights, marks, jumps, changes, digraphs, script names, version, buffers, history, and autocmd listings.
