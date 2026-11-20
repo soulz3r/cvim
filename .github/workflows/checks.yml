@@ -18,7 +18,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: 2.5.2
-          args: --check lua/soul/ui/ui2.lua lua/soul/plugins/tiny_cmdline.lua tests/run.lua tests/startup.lua
+          args: --check lua tests
 
       - name: Install Neovim stable
         shell: bash
