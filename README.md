@@ -1,21 +1,33 @@
 # CVIM
 
-A minimal Neovim configuration.
+A minimal Neovim configuration for Neovim 0.12+.
 
-**C, with a better editor.**
+CVIM keeps native Neovim settings, keymaps, autocmds, a phosphor-green colorscheme, Lazy.nvim, and the Mini.nvim modules.
 
-This branch contains only the editor core:
+## Included
 
-- Basic editing, display, search, clipboard, and indentation options.
-- A small set of portable keymaps.
-- Core autocmds for formatting behavior, external file changes, yank highlighting, and prose buffers.
-- Small platform and path helpers used by the core options.
+- Native Neovim options, autocmds, diagnostics, and keymaps
+- Minimal green terminal-style colorscheme
+- Lazy.nvim with automatic bootstrap
+- Mini.ai, Mini.files, Mini.icons, Mini.pairs, Mini.sessions, and Mini.surround
 
-No plugin manager, plugins, LSP, completion, debugging, dashboard, statusline, project system, or custom UI.
+Mini.notify is intentionally excluded. Notifications use Neovim's native vim.notify.
 
-## Requirements
+## Key mappings
 
-- Neovim 0.12+
-- A terminal with true-color support
+| Mapping | Action |
+|---|---|
+| <leader>e | Open Mini.files |
+| <leader>ss | Save a project session |
+| <leader>sr | Restore a session |
+| <leader>sd | Delete a session |
+| <leader>L | Open Lazy.nvim |
+| ,, | Exit insert/visual mode; clear search in normal mode |
 
-The entry point is init.lua.
+Inside Mini.files, g. toggles hidden files, g~ changes the working directory, and gx opens the selected entry with the system application.
+
+## Install
+
+Clone this repository into Neovim's config directory and start Neovim. Lazy.nvim bootstraps itself and installs the Mini modules.
+
+Requires Git and Neovim 0.12 or newer.
