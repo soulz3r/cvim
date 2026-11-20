@@ -34,6 +34,23 @@ function M.is_enabled()
 	return M.enabled
 end
 
+local message_timeouts = {
+	emsg = 6000,
+	lua_error = 6000,
+	echoerr = 6000,
+	rpc_error = 6000,
+	shell_err = 4000,
+	wmsg = 4000,
+	echo = 2000,
+	echomsg = 2000,
+	quickfix = 2000,
+	search_count = 2000,
+	return_prompt = false,
+	confirm = false,
+	input = false,
+	list_cmd = false,
+}
+
 function M.setup()
 	if M.enabled then
 		return true

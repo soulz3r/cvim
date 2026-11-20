@@ -67,7 +67,7 @@ test("plugin specifications and lockfile agree", function()
 	assert(#minmax == 1)
 	assert(tiny_cmdline[1] == "rachartier/tiny-cmdline.nvim")
 	assert(lockfile["mini.files"] and lockfile["mini.icons"])
-	assert(lockfile["tiny-cmdline.nvim"] and lockfile["blink.cmp"])
+	assert(lockfile["tiny-cmdline.nvim"] and not lockfile["blink.cmp"])
 end)
 
 test("UI2 remains available on Windows", function()
@@ -155,7 +155,7 @@ test("UI2 initializes once and restores all handlers", function()
 	assert(message_store.msg_show == original_message_show)
 end)
 
-test("UI2 bottom messages clear after three seconds", function()
+test("UI2 messages use severity-based timeouts", function()
 	local original_defer = vim.defer_fn
 	local callbacks, delays = {}, {}
 	local clear_calls = 0
@@ -186,14 +186,21 @@ test("UI2 bottom messages clear after three seconds", function()
 
 	local manager = require("soul.ui.ui2")
 	assert(manager.setup())
-	message_store.msg_show("first")
-	message_store.msg_show("second")
-	assert(delays[1] == 3000 and delays[2] == 3000)
+	message_store.msg_show("echo", "information")
+	message_store.msg_show("wmsg", "warning")
+	message_store.msg_show("emsg", "error")
+	message_store.msg_show("return_prompt", "press enter")
+	assert(delays[1] == 2000)
+	assert(delays[2] == 4000)
+	assert(delays[3] == 6000)
+	assert(#delays == 3, "interactive prompts must not be auto-cleared")
 
 	callbacks[1]()
 	assert(clear_calls == 0, "an older timer must not clear a newer message")
 	callbacks[2]()
-	assert(clear_calls == 1, "the latest message should clear after three seconds")
+	assert(clear_calls == 0, "an older timer must not clear a newer message")
+	callbacks[3]()
+	assert(clear_calls == 1, "the latest error should clear after six seconds")
 
 	assert(manager.restore())
 	vim.defer_fn = original_defer
