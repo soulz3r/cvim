@@ -31,20 +31,25 @@ local function float_config(title)
   }
 end
 
-local function style_health_float(buf)
-  vim.schedule(function()
-    if not vim.api.nvim_buf_is_valid(buf) then return end
-    for _, win in ipairs(vim.api.nvim_list_wins()) do
-      if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf then
-        local config = vim.api.nvim_win_get_config(win)
-        if config.relative ~= "" then
-          vim.api.nvim_win_set_config(win, vim.tbl_extend("force", config, float_config("Checkhealth")))
-          vim.wo[win].wrap = false
-          vim.wo[win].cursorline = false
-        end
-      end
-    end
-  end)
+local function run_health_command(command_line)
+  local util = vim.lsp.util
+  local original = util.open_floating_preview
+  util.open_floating_preview = function(contents, syntax, options, ...)
+    options = vim.tbl_extend("force", options or {}, {
+      width = math.min(math.max(1, vim.o.columns - 4), math.max(1, math.min(120, math.floor(vim.o.columns * 0.85)))),
+      height = math.min(math.max(1, vim.o.lines - vim.o.cmdheight - 4), math.max(1, math.min(32, math.floor((vim.o.lines - vim.o.cmdheight) * 0.78)))),
+      offset_x = math.max(0, math.floor((vim.o.columns - math.min(120, math.floor(vim.o.columns * 0.85))) / 2)),
+      offset_y = math.max(0, math.floor((vim.o.lines - vim.o.cmdheight - math.min(32, math.floor((vim.o.lines - vim.o.cmdheight) * 0.78))) / 2)),
+      border = "rounded",
+      title = " Checkhealth ",
+      title_pos = "center",
+    })
+    return original(contents, syntax, options, ...)
+  end
+
+  local ok, err = pcall(vim.cmd, command_line)
+  util.open_floating_preview = original
+  if not ok then vim.notify(tostring(err), vim.log.levels.ERROR) end
 end
 
 function M.open_output(title, output, filetype)
@@ -140,6 +145,10 @@ local function handle_command(command_line)
   end
   local command = parsed.cmd:lower()
   local args = parsed.args or {}
+  if command == "checkhealth" then
+    vim.schedule(function() run_health_command(command_line) end)
+    return true
+  end
   if command == "help" or command == "h" or command == "man" then
     local title = command == "man" and "Man" or "Help"
     vim.schedule(function() run_buffer_command(command_line, title) end)
@@ -155,12 +164,6 @@ end
 
 function M.setup()
   setup_native_messages()
-  local group = vim.api.nvim_create_augroup("CVIMHealthFloat", { clear = true })
-  vim.api.nvim_create_autocmd("FileType", {
-    group = group,
-    pattern = "checkhealth",
-    callback = function(event) style_health_float(event.buf) end,
-  })
   vim.api.nvim_create_user_command("Messages", open_messages, {
     desc = "Show message history in a centered, titled window",
   })
