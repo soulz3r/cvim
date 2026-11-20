@@ -110,6 +110,14 @@ local M = {
                         desc = "Exit terminal mode",
                         silent = true,
                     })
+
+                    vim.keymap.set("n", "q", function()
+                        term:close()
+                    end, {
+                        buffer = term.bufnr,
+                        desc = "Close terminal window",
+                        silent = true,
+                    })
                 end,
 
                 float_opts = {
