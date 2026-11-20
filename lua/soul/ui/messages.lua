@@ -229,4 +229,8 @@ function M.setup()
   })
 end
 
+-- Kept private to CVIM; exposed for focused regression coverage.
+M._run_health_command = run_health_command
+M._run_buffer_command = run_buffer_command
+
 return M

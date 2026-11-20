@@ -12,7 +12,7 @@ CVIM keeps core editing behavior, UI settings, diagnostics, messages, keymaps, t
 - Mini.ai, Mini.files, Mini.icons, Mini.pairs, and Mini.surround
 - Tiny-cmdline with Blink's reposition adapter and Neovim 0.12 UI2 support
 
-Tiny-cmdline is optional at startup. CVIM initializes UI2 once through `soul.ui.ui2`; if UI2 is unavailable or Tiny-cmdline setup fails, CVIM restores the native command line and message handler.
+Tiny-cmdline is optional at startup. CVIM initializes UI2 once through `soul.ui.ui2`. If UI2 is unavailable or Tiny-cmdline setup fails, CVIM restores the native command line, restores the original UI2 message handlers, and explicitly disables UI2.
 
 Mini.notify is intentionally excluded. Error and warning messages use native notifications when Tiny-cmdline is active.
 
@@ -31,15 +31,15 @@ CVIM uses a transparent UI with visible, rounded borders:
 - Temporary help/man command windows are cleaned up across tabs before the captured output is displayed.
 - CVIM-owned floating layouts avoid unnecessary outer spacing; plugin-owned layouts keep their own sizing where required.
 
-Neovim does not provide one global margin or padding option for every window. The UI2 and health-float integrations use Neovim 0.12 internal interfaces, so they are isolated in small modules and covered by smoke tests where practical.
+Neovim does not provide one global margin or padding option for every window. The UI2 and health-float integrations use Neovim 0.12 internal interfaces, so they are isolated in small modules and covered by focused regression tests. UI2 is experimental and can change between Neovim releases.
 
 ## Structure
 
 - `lua/soul/core`: editing options, platform integration, autocmds, and keymaps
 - `lua/soul/ui`: global presentation defaults, diagnostics, UI2 initialization, and message/output UI
 - `lua/soul/plugins`: plugin specifications and colorscheme loading
-- `tests`: headless regression checks
-- `.github/workflows`: automated syntax and smoke checks
+- `tests`: headless regression checks and isolated startup smoke test
+- `.github/workflows`: automated formatting, syntax, and smoke checks
 
 Side-effect modules expose `M.setup()`. Plugin specification modules return their specification tables. The entrypoint calls setup functions explicitly.
 
@@ -63,7 +63,13 @@ Run the headless regression suite from the repository root:
 nvim --headless -u NONE -c "lua dofile('tests/run.lua')" -c "qa!"
 ```
 
-GitHub Actions runs the same checks against the current stable Neovim release.
+Run the isolated startup test:
+
+```sh
+nvim --headless -u NONE -c "lua dofile('tests/startup.lua')" -c "qa!"
+```
+
+GitHub Actions checks StyLua formatting for the UI2 and test harness files, runs the regression suite, and exercises the complete `init.lua` startup with Lazy.nvim isolated from network access.
 
 ## Install
 
