@@ -52,11 +52,11 @@ local M = {
             -- ToggleTerm expects shell to be a command string, not an executable plus args.
             local function command_for(executable, arguments)
                 if is_powershell_host() then
-                    local quoted = "'" .. executable:gsub("'", "''") .. "'"
+                local quoted = '"' .. executable .. '"'
                     return "& " .. quoted .. " " .. arguments
                 end
 
-                local quoted = '"' .. executable:gsub('"', '\\" ') .. '"'
+                local quoted = '"' .. executable .. '"'
                 return quoted .. " " .. arguments
             end
 
