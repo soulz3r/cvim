@@ -1,9 +1,9 @@
--- Global presentation defaults. Plugin-specific windows keep their own settings.
+-- Global presentation defaults. Keep the UI flat, transparent, and unframed.
 vim.opt.cmdheight = 1
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
 vim.opt.pumheight = 10
-vim.opt.pumborder = "rounded"
-vim.opt.pumblend = 10
+vim.opt.pumborder = "none"
+vim.opt.pumblend = 0
 
 vim.opt.showmode = false
 vim.opt.showtabline = 0
@@ -30,5 +30,5 @@ vim.opt.fillchars:append({
   stl = " ",
 })
 
--- Neovim 0.12 global default for floating windows.
-vim.opt.winborder = "rounded"
+-- Neovim 0.12 global defaults: no floating-window frame or added padding.
+vim.opt.winborder = "none"

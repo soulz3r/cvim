@@ -2,34 +2,46 @@
 
 A minimal Neovim configuration for Neovim 0.12+.
 
-CVIM keeps its core editing behavior, UI defaults, diagnostics, messages, keymaps, a phosphor-green colorscheme, Lazy.nvim, and the Mini.nvim modules deliberately separated.
+CVIM keeps core editing behavior, UI settings, diagnostics, messages, keymaps, the Minmax colorscheme, Lazy.nvim, and the Mini.nvim modules separated.
 
 ## Included
 
 - Native Neovim options, autocmds, diagnostics, and keymaps
-- Minimal green terminal-style colorscheme
+- Minmax green terminal-style colorscheme
 - Lazy.nvim with automatic bootstrap
 - Mini.ai, Mini.files, Mini.icons, Mini.pairs, and Mini.surround
 
-Mini.notify is intentionally excluded. Notifications use Neovim's native vim.notify.
+Mini.notify is intentionally excluded. Notifications use Neovim's native `vim.notify`.
+
+## UI
+
+CVIM uses a flat, transparent UI:
+
+- Floating windows and completion menus have no borders.
+- No extra margins or padding are added to CVIM-owned floating windows.
+- Popup blending is disabled.
+- Float and popup backgrounds are transparent through Minmax's `NONE` highlight backgrounds.
+- Colors and syntax highlights remain the colorscheme's responsibility.
+
+Neovim does not provide one global margin or padding option for every window. CVIM avoids adding spacing in its own floating-window layouts; plugin-owned layouts keep their own sizing where required.
 
 ## Structure
 
-- `soul.core`: editing options, platform integration, autocmds, and keymaps
-- `soul.ui`: global presentation defaults, diagnostic floats, and message UI
-- `soul.plugins`: plugin specifications and colorscheme loading
+- `lua/soul/core`: editing options, platform integration, autocmds, and keymaps
+- `lua/soul/ui`: global presentation defaults, diagnostic floats, and message UI
+- `lua/soul/plugins`: plugin specifications and colorscheme loading
 
-Global floating-window and completion-menu borders are configured in `soul.ui.options`. Plugin-specific windows, such as Mini.files and Lazy.nvim, retain their own layout settings. Colors and highlight groups belong to the colorscheme, not the UI behavior modules.
+No separate documentation directory is needed for this configuration. The README is the entry point and describes the setup and its conventions.
 
 ## Key mappings
 
 | Mapping | Action |
 |---|---|
-| <leader>e | Open Mini.files |
-| <leader>L | Open Lazy.nvim |
-| ,, | Exit insert/visual mode; clear search in normal mode |
+| `<leader>e` | Open Mini.files |
+| `<leader>L` | Open Lazy.nvim |
+| `,,` | Exit insert/visual mode; clear search in normal mode |
 
-Inside Mini.files, g. toggles hidden files, g~ changes the working directory, and gx opens the selected entry with the system application.
+Inside Mini.files, `g.` toggles hidden files, `g~` changes the working directory, and `gx` opens the selected entry with the system application.
 
 ## Install
 
