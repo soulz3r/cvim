@@ -1,10 +1,8 @@
--- Classic monochrome phosphor-green terminal palette.
+-- Transparent phosphor-green palette.
 vim.opt.background = "dark"
 vim.g.colors_name = "minmax"
 
 local c = {
-	bg = "#020b05",
-	bg_alt = "#07150a",
 	green = "#75ff75",
 	bright = "#b4ff9b",
 	mid = "#45bd59",
@@ -15,22 +13,22 @@ local c = {
 	black = "#000000",
 }
 
-vim.api.nvim_set_hl(0, "Normal", { fg = c.green, bg = c.bg })
-vim.api.nvim_set_hl(0, "NormalNC", { fg = c.green, bg = c.bg })
-vim.api.nvim_set_hl(0, "EndOfBuffer", { fg = c.muted, bg = c.bg })
-vim.api.nvim_set_hl(0, "Cursor", { fg = c.bg, bg = c.bright })
-vim.api.nvim_set_hl(0, "CursorLine", { bg = c.bg_alt })
+vim.api.nvim_set_hl(0, "Normal", { fg = c.green, bg = "NONE" })
+vim.api.nvim_set_hl(0, "NormalNC", { fg = c.green, bg = "NONE" })
+vim.api.nvim_set_hl(0, "EndOfBuffer", { fg = c.muted, bg = "NONE" })
+vim.api.nvim_set_hl(0, "Cursor", { fg = c.black, bg = c.bright })
+vim.api.nvim_set_hl(0, "CursorLine", { bg = "NONE", underline = true })
 vim.api.nvim_set_hl(0, "CursorLineNr", { fg = c.bright, bold = true })
-vim.api.nvim_set_hl(0, "LineNr", { fg = c.dim })
-vim.api.nvim_set_hl(0, "SignColumn", { fg = c.green, bg = c.bg })
-vim.api.nvim_set_hl(0, "Visual", { fg = c.bright, bg = c.muted })
-vim.api.nvim_set_hl(0, "Search", { fg = c.black, bg = c.yellow })
-vim.api.nvim_set_hl(0, "IncSearch", { fg = c.black, bg = c.bright, bold = true })
-vim.api.nvim_set_hl(0, "MatchParen", { fg = c.bright, bg = c.muted, bold = true })
-vim.api.nvim_set_hl(0, "Pmenu", { fg = c.green, bg = c.bg_alt })
-vim.api.nvim_set_hl(0, "PmenuSel", { fg = c.black, bg = c.mid, bold = true })
-vim.api.nvim_set_hl(0, "FloatBorder", { fg = c.mid, bg = c.bg_alt })
-vim.api.nvim_set_hl(0, "NormalFloat", { fg = c.green, bg = c.bg_alt })
+vim.api.nvim_set_hl(0, "LineNr", { fg = c.dim, bg = "NONE" })
+vim.api.nvim_set_hl(0, "SignColumn", { fg = c.green, bg = "NONE" })
+vim.api.nvim_set_hl(0, "Visual", { fg = c.bright, bg = "NONE", reverse = true })
+vim.api.nvim_set_hl(0, "Search", { fg = c.yellow, bg = "NONE", underline = true, bold = true })
+vim.api.nvim_set_hl(0, "IncSearch", { fg = c.bright, bg = "NONE", underline = true, bold = true })
+vim.api.nvim_set_hl(0, "MatchParen", { fg = c.bright, bg = "NONE", underline = true, bold = true })
+vim.api.nvim_set_hl(0, "Pmenu", { fg = c.green, bg = "NONE" })
+vim.api.nvim_set_hl(0, "PmenuSel", { fg = c.bright, bg = "NONE", reverse = true, bold = true })
+vim.api.nvim_set_hl(0, "FloatBorder", { fg = c.mid, bg = "NONE" })
+vim.api.nvim_set_hl(0, "NormalFloat", { fg = c.green, bg = "NONE" })
 vim.api.nvim_set_hl(0, "Title", { fg = c.bright, bold = true })
 vim.api.nvim_set_hl(0, "Directory", { fg = c.bright, bold = true })
 vim.api.nvim_set_hl(0, "Comment", { fg = c.dim, italic = true })
@@ -58,5 +56,5 @@ vim.api.nvim_set_hl(0, "DiagnosticFloatingHint", { fg = c.dim })
 vim.api.nvim_set_hl(0, "Error", { fg = c.red, bold = true })
 vim.api.nvim_set_hl(0, "ErrorMsg", { fg = c.red, bold = true })
 vim.api.nvim_set_hl(0, "WarningMsg", { fg = c.yellow, bold = true })
-vim.api.nvim_set_hl(0, "StatusLine", { fg = c.green, bg = c.bg })
-vim.api.nvim_set_hl(0, "StatusLineNC", { fg = c.dim, bg = c.bg })
+vim.api.nvim_set_hl(0, "StatusLine", { fg = c.green, bg = "NONE" })
+vim.api.nvim_set_hl(0, "StatusLineNC", { fg = c.dim, bg = "NONE" })
