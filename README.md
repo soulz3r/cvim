@@ -9,7 +9,7 @@ CVIM keeps native Neovim settings, keymaps, autocmds, a phosphor-green colorsche
 - Native Neovim options, autocmds, diagnostics, and keymaps
 - Minimal green terminal-style colorscheme
 - Lazy.nvim with automatic bootstrap
-- Mini.ai, Mini.files, Mini.icons, Mini.pairs, Mini.sessions, and Mini.surround
+- Mini.ai, Mini.files, Mini.icons, Mini.pairs, and Mini.surround
 
 Mini.notify is intentionally excluded. Notifications use Neovim's native vim.notify.
 
@@ -18,9 +18,6 @@ Mini.notify is intentionally excluded. Notifications use Neovim's native vim.not
 | Mapping | Action |
 |---|---|
 | <leader>e | Open Mini.files |
-| <leader>ss | Save a project session |
-| <leader>sr | Restore a session |
-| <leader>sd | Delete a session |
 | <leader>L | Open Lazy.nvim |
 | ,, | Exit insert/visual mode; clear search in normal mode |
 

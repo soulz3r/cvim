@@ -23,5 +23,4 @@ return {
   { "nvim-mini/mini.pairs", event = "InsertEnter", config = setup("pairs") },
   { "nvim-mini/mini.ai", event = { "BufReadPost", "BufNewFile" }, config = setup("ai") },
   { "nvim-mini/mini.surround", event = { "BufReadPost", "BufNewFile" }, config = setup("surround") },
-  { "nvim-mini/mini.sessions", config = setup("sessions") },
 }
