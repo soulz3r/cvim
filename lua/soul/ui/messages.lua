@@ -201,10 +201,12 @@ local function handle_command(command_line)
 end
 
 function M.setup()
-  local ui2 = require("soul.ui.ui2")
-  local enabled, err = ui2.setup()
-  if not enabled then
-    vim.notify("Neovim UI2 is unavailable; using native messages.\n" .. tostring(err), vim.log.levels.WARN)
+  if vim.fn.has("win32") ~= 1 then
+    local ui2 = require("soul.ui.ui2")
+    local enabled, err = ui2.setup()
+    if not enabled then
+      vim.notify("Neovim UI2 is unavailable; using native messages.\n" .. tostring(err), vim.log.levels.WARN)
+    end
   end
 
   vim.api.nvim_create_user_command("Messages", open_messages, {
