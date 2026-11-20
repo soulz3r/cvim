@@ -53,56 +53,44 @@ vim.api.nvim_create_autocmd("CursorHold", {
 	end,
 })
 
--- Keep the native command line. Display vim.notify messages in a persistent float.
-local message_win
-local message_buf
-
-local function show_message(message, level, title)
-	message = tostring(message or "")
-	if message == "" then return end
-
-	if not message_buf or not vim.api.nvim_buf_is_valid(message_buf) then
-		message_buf = vim.api.nvim_create_buf(false, true)
+-- Open the complete :messages history in the same large centered float style.
+local function show_messages()
+	local messages = vim.api.nvim_exec2("messages", { output = true }).output
+	local lines = vim.split(messages, "\n", { plain = true })
+	if #lines == 0 or (#lines == 1 and lines[1] == "") then
+		lines = { "No messages." }
 	end
 
-	local lines = vim.split(message, "\n", { plain = true })
-	vim.api.nvim_buf_set_lines(message_buf, 0, -1, false, lines)
+	local width = math.max(1, math.min(vim.o.columns - 4, math.floor(vim.o.columns * 0.80)))
+	local height = math.max(1, math.min(vim.o.lines - 4, math.floor(vim.o.lines * 0.70)))
+	local buf = vim.api.nvim_create_buf(false, true)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+	vim.bo[buf].buftype = "nofile"
+	vim.bo[buf].bufhidden = "wipe"
+	vim.bo[buf].swapfile = false
+	vim.bo[buf].modifiable = false
+	vim.bo[buf].filetype = "messages"
 
-	local width = math.min(math.max(40, vim.o.columns - 8), 80)
-	local height = math.min(math.max(1, #lines), math.max(1, vim.o.lines - 6))
-	local row = math.max(0, vim.o.lines - height - 4)
-	local col = math.max(0, vim.o.columns - width - 2)
-
-	if message_win and vim.api.nvim_win_is_valid(message_win) then
-		vim.api.nvim_win_set_config(message_win, {
-			relative = "editor", row = row, col = col, width = width, height = height,
-		})
-	else
-		message_win = vim.api.nvim_open_win(message_buf, false, {
-			relative = "editor", row = row, col = col, width = width, height = height,
-			style = "minimal", border = "rounded",
-			title = title or " Message ", title_pos = "left",
-		})
-	end
-
-	local hl = level == vim.log.levels.ERROR and "DiagnosticError"
-		or level == vim.log.levels.WARN and "DiagnosticWarn"
-		or "Normal"
-	vim.wo[message_win].winhighlight = "Normal:" .. hl .. ",FloatBorder:FloatBorder"
+	local win = vim.api.nvim_open_win(buf, true, {
+		relative = "editor",
+		style = "minimal",
+		border = "rounded",
+		title = " Messages ",
+		title_pos = "center",
+		width = width,
+		height = height,
+		row = math.max(0, math.floor((vim.o.lines - height) / 2)),
+		col = math.max(0, math.floor((vim.o.columns - width) / 2)),
+	})
+	vim.wo[win].wrap = true
+	vim.wo[win].cursorline = true
+	vim.keymap.set("n", "q", function() vim.api.nvim_win_close(win, true) end, {
+		buffer = buf, silent = true, nowait = true,
+	})
+	vim.keymap.set("n", "<Esc>", function() vim.api.nvim_win_close(win, true) end, {
+		buffer = buf, silent = true, nowait = true,
+	})
 end
 
-vim.notify = function(message, level, opts)
-	opts = opts or {}
-	show_message(message, level or vim.log.levels.INFO, opts.title)
-end
-
--- :messages opens the latest recorded message in the same float.
-vim.api.nvim_create_user_command("Messages", function()
-	local history = vim.api.nvim_exec2("messages", { output = true }).output
-	local latest
-	for line in history:gmatch("[^\n]+") do
-		if line:match("%S") then latest = line end
-	end
-	show_message(latest or "No messages", vim.log.levels.INFO, " Messages ")
-end, {})
+vim.api.nvim_create_user_command("Messages", show_messages, {})
 vim.cmd([[cnoreabbrev <expr> messages getcmdtype() == ':' && getcmdline() ==# 'messages' ? 'Messages' : 'messages']])
