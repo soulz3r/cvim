@@ -36,8 +36,7 @@ vim.opt.numberwidth = 2
 vim.opt.signcolumn = "yes"
 
 vim.opt.laststatus = 0
-
-vim.opt.showcmd = true
+vim.opt.showcmd = false
 vim.opt.ruler = false
 
 vim.opt.wrap = false
