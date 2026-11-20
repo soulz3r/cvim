@@ -2,7 +2,7 @@
 
 A minimal Neovim configuration for Neovim 0.12+.
 
-CVIM keeps core editing behavior, UI settings, diagnostics, messages, keymaps, the Minmax colorscheme, Lazy.nvim, Mini.nvim, and a compact command-line UI separated into small modules.
+CVIM keeps core editing behavior, UI settings, diagnostics, messages, keymaps, the Minmax colorscheme, Lazy.nvim, Mini.nvim, Telescope, and a compact command-line UI separated into small modules.
 
 ## Included
 
@@ -10,6 +10,7 @@ CVIM keeps core editing behavior, UI settings, diagnostics, messages, keymaps, t
 - Minmax green terminal-style colorscheme
 - Lazy.nvim with automatic bootstrap
 - Mini.ai, Mini.files, Mini.icons, Mini.pairs, and Mini.surround
+- Telescope for file finding, live grep, buffers, and help
 - ToggleTerm with a floating terminal, using Git Bash on Windows and explicitly loading `D:/config/bash/.bashrc`, with `pwsh` and Windows PowerShell fallbacks
 - Tiny-cmdline with Neovim's built-in command-line completion and Neovim 0.12 UI2 support on non-Windows platforms; Windows uses the native command line
 
@@ -51,11 +52,17 @@ No separate documentation directory is needed for this configuration. The README
 | Mapping | Action |
 |---|---|
 | <leader>e | Open Mini.files |
+| <leader>ff | Find files |
+| <leader>fg | Live grep |
+| <leader>fb | Find buffers |
+| <leader>fh | Search help tags |
 | <leader>L | Open Lazy.nvim |
 | Ctrl+\\ | Toggle the terminal |
 | ,, | Exit insert/visual mode; clear search in normal mode |
 
 Inside Mini.files, `g.` toggles hidden files, `g~` changes the working directory, and `gx` opens the selected entry with the system application.
+
+Live grep uses ripgrep, so `rg` must be available on PATH.
 
 ## Checks
 
