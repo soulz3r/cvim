@@ -74,42 +74,24 @@ test("plugin specifications and lockfile agree", function()
 	assert(lockfile["tiny-cmdline.nvim"] and lockfile["toggleterm.nvim"] and not lockfile["blink.cmp"])
 end)
 
-test("UI2 remains available on Windows", function()
+test("UI2 stays disabled on Windows", function()
 	local original_has = vim.fn.has
-	local ui2 = {
-		msg = { msg_show = function() end },
-		enable = function(options)
-			if options.enable then
-				assert(options.msg.targets == "cmd")
-			end
-		end,
-	}
-
 	vim.fn.has = function(feature)
 		if feature == "win32" then
 			return 1
 		end
 		return original_has(feature)
 	end
-	package.loaded["vim._core.ui2"] = nil
-	package.preload["vim._core.ui2"] = function()
-		return ui2
-	end
-	package.preload["vim._core.ui2.messages"] = function()
-		return { msg_show = function() end, msg_clear = function() end }
-	end
-	package.loaded["soul.ui.ui2"] = nil
 
+	package.loaded["soul.ui.ui2"] = nil
 	local manager = require("soul.ui.ui2")
-	assert(manager.setup())
-	assert(manager.is_enabled())
+	local enabled, err = manager.setup()
+
+	assert(not enabled)
+	assert(not manager.is_enabled())
+	assert(err:find("disabled on Windows", 1, true))
 
 	vim.fn.has = original_has
-	assert(manager.restore())
-	package.preload["vim._core.ui2"] = nil
-	package.preload["vim._core.ui2.messages"] = nil
-	package.loaded["vim._core.ui2"] = nil
-	package.loaded["vim._core.ui2.messages"] = nil
 	package.loaded["soul.ui.ui2"] = nil
 end)
 
