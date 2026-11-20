@@ -16,13 +16,40 @@ local function setup_native_messages()
   end
 end
 
+local function float_config(title)
+  local width = math.min(math.max(1, vim.o.columns - 4), math.max(1, math.min(120, math.floor(vim.o.columns * 0.85))))
+  local height = math.min(math.max(1, vim.o.lines - vim.o.cmdheight - 4), math.max(1, math.min(32, math.floor((vim.o.lines - vim.o.cmdheight) * 0.78))))
+  return {
+    relative = "editor",
+    row = math.max(0, math.floor((vim.o.lines - vim.o.cmdheight - height) / 2)),
+    col = math.max(0, math.floor((vim.o.columns - width) / 2)),
+    width = width,
+    height = height,
+    border = "rounded",
+    title = " " .. title .. " ",
+    title_pos = "center",
+  }
+end
+
+local function style_health_float(buf)
+  vim.schedule(function()
+    if not vim.api.nvim_buf_is_valid(buf) then return end
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf then
+        local config = vim.api.nvim_win_get_config(win)
+        if config.relative ~= "" then
+          vim.api.nvim_win_set_config(win, vim.tbl_extend("force", config, float_config("Checkhealth")))
+          vim.wo[win].wrap = false
+          vim.wo[win].cursorline = false
+        end
+      end
+    end
+  end)
+end
+
 function M.open_output(title, output, filetype)
   local lines = type(output) == "table" and output or vim.split(output or "", "\n", { plain = true })
   if #lines == 0 or (#lines == 1 and lines[1] == "") then lines = { "No output." } end
-  local width = math.min(math.max(1, vim.o.columns - 4), math.max(1, math.min(120, math.floor(vim.o.columns * 0.85))))
-  local height = math.min(math.max(1, vim.o.lines - vim.o.cmdheight - 4), math.max(1, math.min(32, math.floor((vim.o.lines - vim.o.cmdheight) * 0.78))))
-  local row = math.max(0, math.floor((vim.o.lines - vim.o.cmdheight - height) / 2))
-  local col = math.max(0, math.floor((vim.o.columns - width) / 2))
   local buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
   vim.bo[buf].buftype = "nofile"
@@ -30,10 +57,7 @@ function M.open_output(title, output, filetype)
   vim.bo[buf].modifiable = false
   vim.bo[buf].swapfile = false
   vim.bo[buf].filetype = filetype or "vim"
-  local win = vim.api.nvim_open_win(buf, true, {
-    relative = "editor", row = row, col = col, width = width, height = height,
-    style = "minimal", border = "rounded", title = " " .. title .. " ", title_pos = "center",
-  })
+  local win = vim.api.nvim_open_win(buf, true, vim.tbl_extend("force", float_config(title), { style = "minimal" }))
   vim.wo[win].wrap = false
   vim.wo[win].cursorline = false
   vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = buf, silent = true })
@@ -131,6 +155,12 @@ end
 
 function M.setup()
   setup_native_messages()
+  local group = vim.api.nvim_create_augroup("CVIMHealthFloat", { clear = true })
+  vim.api.nvim_create_autocmd("FileType", {
+    group = group,
+    pattern = "checkhealth",
+    callback = function(event) style_health_float(event.buf) end,
+  })
   vim.api.nvim_create_user_command("Messages", open_messages, {
     desc = "Show message history in a centered, titled window",
   })
