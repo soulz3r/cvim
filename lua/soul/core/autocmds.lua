@@ -53,45 +53,57 @@ vim.api.nvim_create_autocmd("CursorHold", {
 	end,
 })
 
--- Route :messages to a centered floating window instead of the command line.
+-- Show only the latest :messages entry in a temporary floating window.
+local message_win
+
 local function show_messages()
-	local messages = vim.api.nvim_exec2("messages", { output = true }).output
-	local lines = vim.split(messages, "\n", { plain = true })
-	if #lines == 0 then
-		lines = { "No messages." }
+	local output = vim.api.nvim_exec2("messages", { output = true }).output
+	local lines = vim.split(output, "\n", { plain = true })
+	local message
+
+	for i = #lines, 1, -1 do
+		local line = vim.trim(lines[i])
+		if line ~= "" then
+			message = line
+			break
+		end
 	end
 
-	local width = math.max(1, math.min(vim.o.columns - 4, math.floor(vim.o.columns * 0.80)))
-	local height = math.max(1, math.min(vim.o.lines - 4, math.floor(vim.o.lines * 0.70)))
+	if not message then
+		message = "No messages."
+	end
+
+	if message_win and vim.api.nvim_win_is_valid(message_win) then
+		vim.api.nvim_win_close(message_win, true)
+	end
+
+	local max_width = math.max(1, math.floor(vim.o.columns * 0.80))
+	local width = math.min(max_width, math.max(24, #message + 2))
 	local buf = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, { message })
 	vim.bo[buf].buftype = "nofile"
 	vim.bo[buf].bufhidden = "wipe"
 	vim.bo[buf].swapfile = false
 	vim.bo[buf].modifiable = false
-	vim.bo[buf].filetype = "messages"
 
-	local win = vim.api.nvim_open_win(buf, true, {
+	message_win = vim.api.nvim_open_win(buf, false, {
 		relative = "editor",
 		style = "minimal",
 		border = "rounded",
-		title = " Messages ",
-		title_pos = "center",
 		width = width,
-		height = height,
-		row = math.max(0, math.floor((vim.o.lines - height) / 2)),
+		height = 1,
+		row = math.max(0, math.floor((vim.o.lines - 3) / 2)),
 		col = math.max(0, math.floor((vim.o.columns - width) / 2)),
 	})
-	vim.wo[win].wrap = true
-	vim.wo[win].cursorline = true
+	vim.wo[message_win].wrap = true
 
-	local function close()
-		if vim.api.nvim_win_is_valid(win) then
+	local win = message_win
+	vim.defer_fn(function()
+		if message_win == win and vim.api.nvim_win_is_valid(win) then
 			vim.api.nvim_win_close(win, true)
+			message_win = nil
 		end
-	end
-	vim.keymap.set("n", "q", close, { buffer = buf, silent = true, nowait = true })
-	vim.keymap.set("n", "<Esc>", close, { buffer = buf, silent = true, nowait = true })
+	end, 2500)
 end
 
 vim.api.nvim_create_user_command("Messages", show_messages, {})
