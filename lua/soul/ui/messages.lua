@@ -1,24 +1,9 @@
 local M = {}
 
-local function setup_native_messages()
-  local ui2 = require("vim._core.ui2")
-  ui2.enable({ msg = { targets = "cmd" } })
-  local messages = require("vim._core.ui2.messages")
-  local original_msg_show = messages.msg_show
-  local message_generation = 0
-  messages.msg_show = function(...)
-    original_msg_show(...)
-    message_generation = message_generation + 1
-    local generation = message_generation
-    vim.defer_fn(function()
-      if generation == message_generation then messages.msg_clear() end
-    end, 5000)
-  end
-end
-
 local function float_config(title)
   local width = math.min(math.max(1, vim.o.columns - 4), math.max(1, math.min(120, math.floor(vim.o.columns * 0.85))))
   local height = math.min(math.max(1, vim.o.lines - vim.o.cmdheight - 4), math.max(1, math.min(32, math.floor((vim.o.lines - vim.o.cmdheight) * 0.78))))
+
   return {
     relative = "editor",
     row = math.max(0, math.floor((vim.o.lines - vim.o.cmdheight - height) / 2)),
@@ -34,27 +19,35 @@ end
 local function run_health_command(command_line)
   local util = vim.lsp.util
   local original = util.open_floating_preview
+  if type(original) ~= "function" then
+    vim.notify("Neovim's floating preview utility is unavailable", vim.log.levels.ERROR)
+    return
+  end
+
   util.open_floating_preview = function(contents, syntax, options, ...)
+    local config = float_config("Checkhealth")
     options = vim.tbl_extend("force", options or {}, {
-      width = math.min(math.max(1, vim.o.columns - 4), math.max(1, math.min(120, math.floor(vim.o.columns * 0.85)))),
-      height = math.min(math.max(1, vim.o.lines - vim.o.cmdheight - 4), math.max(1, math.min(32, math.floor((vim.o.lines - vim.o.cmdheight) * 0.78)))),
-      offset_x = math.max(0, math.floor((vim.o.columns - math.min(120, math.floor(vim.o.columns * 0.85))) / 2)),
-      offset_y = math.max(0, math.floor((vim.o.lines - vim.o.cmdheight - math.min(32, math.floor((vim.o.lines - vim.o.cmdheight) * 0.78))) / 2)),
-      border = "rounded",
-      title = " Checkhealth ",
-      title_pos = "center",
+      width = config.width,
+      height = config.height,
+      offset_x = config.col,
+      offset_y = config.row,
+      border = config.border,
+      title = config.title,
+      title_pos = config.title_pos,
     })
     return original(contents, syntax, options, ...)
   end
 
   local ok, err = pcall(vim.cmd, command_line)
   util.open_floating_preview = original
+
   if not ok then vim.notify(tostring(err), vim.log.levels.ERROR) end
 end
 
 function M.open_output(title, output, filetype)
   local lines = type(output) == "table" and output or vim.split(output or "", "\n", { plain = true })
   if #lines == 0 or (#lines == 1 and lines[1] == "") then lines = { "No output." } end
+
   local buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
   vim.bo[buf].buftype = "nofile"
@@ -62,6 +55,7 @@ function M.open_output(title, output, filetype)
   vim.bo[buf].modifiable = false
   vim.bo[buf].swapfile = false
   vim.bo[buf].filetype = filetype or "vim"
+
   local win = vim.api.nvim_open_win(buf, true, vim.tbl_extend("force", float_config(title), { style = "minimal" }))
   vim.wo[win].wrap = false
   vim.wo[win].cursorline = false
@@ -94,19 +88,54 @@ local function parse_command(command_line)
   return parsed
 end
 
+local function snapshot_windows()
+  local tabs, windows = {}, {}
+
+  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+    tabs[tab] = true
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+      windows[win] = true
+    end
+  end
+
+  return tabs, windows
+end
+
+local function cleanup_command_windows(tabs_before, windows_before, temp_win, scratch)
+  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+    if not tabs_before[tab] then
+      pcall(vim.api.nvim_tabpage_close, tab, true)
+    else
+      for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+        if not windows_before[win] and win ~= temp_win and vim.api.nvim_win_is_valid(win) then
+          pcall(vim.api.nvim_win_close, win, true)
+        end
+      end
+    end
+  end
+
+  if vim.api.nvim_win_is_valid(temp_win) then pcall(vim.api.nvim_win_close, temp_win, true) end
+  if vim.api.nvim_buf_is_valid(scratch) then pcall(vim.api.nvim_buf_delete, scratch, { force = true }) end
+end
+
 local function run_buffer_command(command_line, title)
   local original_tab = vim.api.nvim_get_current_tabpage()
   local original_win = vim.api.nvim_get_current_win()
-  local windows_before = {}
-  for _, win in ipairs(vim.api.nvim_list_wins()) do windows_before[win] = true end
+  local tabs_before, windows_before = snapshot_windows()
 
   local scratch = vim.api.nvim_create_buf(false, true)
-  local ok, temp_win = pcall(vim.api.nvim_open_win, scratch, false, {
-    relative = "editor", row = vim.o.lines + 10, col = 0,
-    width = 1, height = 1, style = "minimal", focusable = true,
+  local opened, temp_win = pcall(vim.api.nvim_open_win, scratch, false, {
+    relative = "editor",
+    row = vim.o.lines + 10,
+    col = 0,
+    width = 1,
+    height = 1,
+    style = "minimal",
+    focusable = true,
   })
-  if not ok then
-    vim.api.nvim_buf_delete(scratch, { force = true })
+
+  if not opened then
+    if vim.api.nvim_buf_is_valid(scratch) then vim.api.nvim_buf_delete(scratch, { force = true }) end
     vim.notify("Could not create command output workspace: " .. tostring(temp_win), vim.log.levels.ERROR)
     return
   end
@@ -114,23 +143,26 @@ local function run_buffer_command(command_line, title)
   local ran, result = pcall(vim.api.nvim_win_call, temp_win, function()
     vim.cmd(command_line)
     local buf = vim.api.nvim_get_current_buf()
-    return { lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false), filetype = vim.bo[buf].filetype }
+    return {
+      lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false),
+      filetype = vim.bo[buf].filetype,
+    }
   end)
 
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    if not windows_before[win] and win ~= temp_win and vim.api.nvim_win_is_valid(win) then
-      pcall(vim.api.nvim_win_close, win, true)
-    end
+  cleanup_command_windows(tabs_before, windows_before, temp_win, scratch)
+
+  if vim.api.nvim_tabpage_is_valid(original_tab) then
+    pcall(vim.api.nvim_set_current_tabpage, original_tab)
   end
-  if vim.api.nvim_win_is_valid(temp_win) then pcall(vim.api.nvim_win_close, temp_win, true) end
-  if vim.api.nvim_buf_is_valid(scratch) then pcall(vim.api.nvim_buf_delete, scratch, { force = true }) end
+  if vim.api.nvim_win_is_valid(original_win) then
+    pcall(vim.api.nvim_set_current_win, original_win)
+  end
 
   if not ran then
     vim.notify(tostring(result), vim.log.levels.ERROR)
     return
   end
-  if vim.api.nvim_tabpage_is_valid(original_tab) then pcall(vim.api.nvim_set_current_tabpage, original_tab) end
-  if vim.api.nvim_win_is_valid(original_win) then pcall(vim.api.nvim_set_current_win, original_win) end
+
   M.open_output(title, result.lines, result.filetype)
 end
 
@@ -143,40 +175,56 @@ local function handle_command(command_line)
   then
     return false
   end
+
   local command = parsed.cmd:lower()
   local args = parsed.args or {}
+
   if command == "checkhealth" then
     vim.schedule(function() run_health_command(command_line) end)
     return true
   end
+
   if command == "help" or command == "h" or command == "man" then
     local title = command == "man" and "Man" or "Help"
     vim.schedule(function() run_buffer_command(command_line, title) end)
     return true
   end
+
   local limits = output_commands[command]
   if not limits or #args < limits.min or #args > limits.max then return false end
+
   local ok, result = pcall(vim.api.nvim_exec2, command_line, { output = true })
   if not ok then return false end
+
   vim.schedule(function() M.open_output(command, result.output) end)
   return true
 end
 
 function M.setup()
-  setup_native_messages()
+  local ui2 = require("soul.ui.ui2")
+  local enabled, err = ui2.setup()
+  if not enabled then
+    vim.o.cmdheight = 1
+    vim.notify("Neovim UI2 is unavailable; using native messages.\n" .. tostring(err), vim.log.levels.WARN)
+  end
+
   vim.api.nvim_create_user_command("Messages", open_messages, {
     desc = "Show message history in a centered, titled window",
   })
+
   vim.keymap.set("c", "<CR>", function()
     if vim.fn.getcmdtype() ~= ":" then return "<CR>" end
+
     local command_line = vim.fn.getcmdline()
     local trimmed = vim.trim(command_line)
     if trimmed == "" then return "<CR>" end
     if trimmed:lower() == "messages" then return "<C-u>Messages<CR>" end
     if handle_command(command_line) then return "<C-c>" end
+
     return "<CR>"
   end, {
-    expr = true, noremap = true,
+    expr = true,
+    noremap = true,
     desc = "Open inspectable command output in a floating window",
   })
 end
