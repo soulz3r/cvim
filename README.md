@@ -21,9 +21,10 @@ CVIM uses a transparent UI with visible, rounded borders:
 - Border foregrounds come from the active colorscheme and remain visible.
 - Border, float, title, footer, and popup backgrounds are forced to `NONE`, preventing a colored strip or halo around the outline.
 - Popup blending is disabled; completion selection colors and syntax highlighting remain intact.
-- CVIM-owned floating layouts reserve only the cells needed to draw their borders.
+- The `:Messages` history opens in a centered, compact window with a titled rounded border.
+- CVIM-owned floating layouts avoid unnecessary outer spacing; plugin-owned layouts keep their own sizing where required.
 
-Neovim does not provide one global margin or padding option for every window. CVIM avoids adding extra spacing in its own floating-window layouts; plugin-owned layouts keep their own sizing where required.
+Neovim does not provide one global margin or padding option for every window.
 
 ## Structure
 

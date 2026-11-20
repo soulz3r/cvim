@@ -31,9 +31,13 @@ local function open_messages()
     lines = { "No messages." }
   end
 
-  -- Reserve exactly the border cells; do not add a colored outer margin.
-  local width = math.max(1, vim.o.columns - 2)
-  local height = math.max(1, vim.o.lines - vim.o.cmdheight - 2)
+  -- Keep the history readable without letting it take over the editor.
+  local available_width = math.max(1, vim.o.columns - 4)
+  local available_height = math.max(1, vim.o.lines - vim.o.cmdheight - 4)
+  local width = math.min(available_width, math.max(1, math.min(100, math.floor(vim.o.columns * 0.8))))
+  local height = math.min(available_height, math.max(1, math.min(30, math.floor((vim.o.lines - vim.o.cmdheight) * 0.75))))
+  local row = math.floor((vim.o.lines - vim.o.cmdheight - height) / 2)
+  local col = math.floor((vim.o.columns - width) / 2)
 
   local buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -44,12 +48,14 @@ local function open_messages()
 
   local win = vim.api.nvim_open_win(buf, true, {
     relative = "editor",
-    row = 1,
-    col = 1,
+    row = row,
+    col = col,
     width = width,
     height = height,
     style = "minimal",
     border = "rounded",
+    title = " Messages ",
+    title_pos = "center",
   })
 
   vim.wo[win].wrap = true
@@ -61,7 +67,7 @@ function M.setup()
   setup_native_messages()
 
   vim.api.nvim_create_user_command("Messages", open_messages, {
-    desc = "Show message history in a rounded full-screen window",
+    desc = "Show message history in a centered, titled window",
   })
 
   vim.keymap.set("c", "<CR>", function()
@@ -73,7 +79,7 @@ function M.setup()
   end, {
     expr = true,
     noremap = true,
-    desc = "Open message history in a rounded window",
+    desc = "Open message history in a centered window",
   })
 end
 
