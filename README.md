@@ -15,12 +15,13 @@ Mini.notify is intentionally excluded. Notifications use Neovim's native `vim.no
 
 ## UI
 
-CVIM uses a flat, transparent UI:
+CVIM uses a transparent UI with visible, rounded borders:
 
-- Floating windows and completion menus have no borders.
-- No extra margins or padding are added to CVIM-owned floating windows.
-- Popup blending is disabled.
-- Float and popup backgrounds are transparent through Minmax's `NONE` highlight backgrounds.
+- Floating windows, diagnostics, completion menus, and Lazy.nvim use rounded borders.
+- Border foregrounds come from the active colorscheme; border backgrounds remain transparent.
+- Float and popup content backgrounds remain transparent through Minmax's `NONE` highlight backgrounds.
+- Popup blending is disabled, so no tinted halo is introduced around completion menus.
+- CVIM-owned floating layouts add no extra outer margin; only the cells needed to draw the border are reserved.
 - Colors and syntax highlights remain the colorscheme's responsibility.
 
 Neovim does not provide one global margin or padding option for every window. CVIM avoids adding spacing in its own floating-window layouts; plugin-owned layouts keep their own sizing where required.

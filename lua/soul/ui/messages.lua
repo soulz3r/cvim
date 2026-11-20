@@ -31,8 +31,9 @@ local function open_messages()
     lines = { "No messages." }
   end
 
-  local width = math.max(1, vim.o.columns)
-  local height = math.max(1, vim.o.lines - vim.o.cmdheight)
+  -- Reserve exactly the border cells; do not add a colored outer margin.
+  local width = math.max(1, vim.o.columns - 2)
+  local height = math.max(1, vim.o.lines - vim.o.cmdheight - 2)
 
   local buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -43,12 +44,12 @@ local function open_messages()
 
   local win = vim.api.nvim_open_win(buf, true, {
     relative = "editor",
-    row = 0,
-    col = 0,
+    row = 1,
+    col = 1,
     width = width,
     height = height,
     style = "minimal",
-    border = "none",
+    border = "rounded",
   })
 
   vim.wo[win].wrap = true
@@ -60,7 +61,7 @@ function M.setup()
   setup_native_messages()
 
   vim.api.nvim_create_user_command("Messages", open_messages, {
-    desc = "Show message history in a borderless full-screen window",
+    desc = "Show message history in a rounded full-screen window",
   })
 
   vim.keymap.set("c", "<CR>", function()
@@ -72,7 +73,7 @@ function M.setup()
   end, {
     expr = true,
     noremap = true,
-    desc = "Open message history in a borderless window",
+    desc = "Open message history in a rounded window",
   })
 end
 

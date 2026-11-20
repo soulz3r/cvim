@@ -4,7 +4,7 @@ function M.setup()
   vim.diagnostic.config({
     virtual_text = false,
     float = {
-      border = "none",
+      border = "rounded",
       source = "if_many",
       header = "",
       prefix = "",
@@ -26,7 +26,7 @@ function M.setup()
           focus = false,
           scope = "cursor",
           severity = vim.diagnostic.severity.ERROR,
-          border = "none",
+          border = "rounded",
         })
       end
     end,

@@ -26,7 +26,7 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   spec = { { import = "soul.plugins" } },
   rocks = { enabled = false, hererocks = false },
-  ui = { border = "none" },
+  ui = { border = "rounded" },
   change_detection = { enabled = true, notify = false },
 })
 vim.keymap.set("n", "<leader>L", "<cmd>Lazy<cr>", { desc = "Open plugin manager" })
