@@ -3,6 +3,10 @@ local M = {
 }
 
 local function get_ui2()
+	if vim.fn.has("win32") == 1 then
+		return nil, "Neovim UI2 is disabled on Windows"
+	end
+
 	if vim.fn.has("nvim-0.12") ~= 1 then
 		return nil, "Neovim 0.12 or newer is required"
 	end
