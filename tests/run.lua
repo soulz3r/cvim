@@ -206,6 +206,7 @@ end)
 
 test("Tiny-cmdline failure rolls UI2 back to native mode", function()
 	local manager = require("soul.ui.ui2")
+	package.loaded["soul.plugins.tiny_cmdline"] = nil
 	local tiny = require("soul.plugins.tiny_cmdline")
 	local original_notify = vim.notify
 	local notifications = {}
