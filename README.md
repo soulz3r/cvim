@@ -13,9 +13,9 @@ CVIM keeps core editing behavior, UI settings, diagnostics, messages, keymaps, t
 - Eyeliner for subtle character-jump hints
 - Telescope for file finding, live grep, buffers, and help
 - ToggleTerm with a floating terminal, using Git Bash on Windows and explicitly loading `D:/config/bash/.bashrc`, with `pwsh` and Windows PowerShell fallbacks
-- Tiny-cmdline with Neovim's built-in command-line completion and Neovim 0.12 UI2 support on non-Windows platforms; Windows uses the native command line
+- Tiny-cmdline with Neovim's built-in command-line completion and Neovim 0.12 UI2 support across Windows and Linux
 
-On Windows, CVIM skips UI2 and Tiny-cmdline and keeps Neovim's native command line. On other platforms, Tiny-cmdline is optional at startup and UI2 is initialized once through `soul.ui.ui2`. If UI2 is unavailable or Tiny-cmdline setup fails, CVIM falls back to native command-line handling and restores the original UI2 message handlers.
+Tiny-cmdline is optional at startup and UI2 is initialized once through `soul.ui.ui2` on supported platforms, including Windows. If UI2 is unavailable or Tiny-cmdline setup fails, CVIM falls back to native command-line handling and restores the original UI2 message handlers.
 
 Mini.notify is intentionally excluded. Error and warning messages use native notifications when Tiny-cmdline is active.
 
@@ -96,7 +96,7 @@ Run the isolated startup test:
 nvim --headless -u NONE -c "lua dofile('tests/startup.lua')" -c "qa!"
 ```
 
-GitHub Actions checks StyLua formatting for the UI2 and test harness files, runs the regression suite, and exercises the complete `init.lua` startup with Lazy.nvim isolated from network access.
+GitHub Actions checks StyLua formatting across Lua modules and tests, runs the regression suite, and exercises the complete `init.lua` startup with Lazy.nvim isolated from network access.
 
 ## Install
 
