@@ -63,7 +63,9 @@ vim.opt.fillchars:append({
 	stl = " ",
 })
 
-vim.cmd("set shortmess+=cu")
+-- Suppress insert-completion messages. The undo/redo 'u' flag is not
+-- supported by the user's installed Neovim build.
+vim.cmd("set shortmess+=c")
 
 -- Core options should not import a helper used by optional floating UIs.
 vim.opt.winborder = "rounded"
