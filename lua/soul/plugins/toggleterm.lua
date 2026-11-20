@@ -104,6 +104,14 @@ local M = {
                 shade_terminals = false,
                 shell = resolve_shell(),
 
+                on_open = function(term)
+                    vim.keymap.set("t", ",,", [[<C-\><C-n>]], {
+                        buffer = term.bufnr,
+                        desc = "Exit terminal mode",
+                        silent = true,
+                    })
+                end,
+
                 float_opts = {
                     border = "rounded",
                     width = 50,
