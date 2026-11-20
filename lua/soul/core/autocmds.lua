@@ -52,18 +52,3 @@ vim.api.nvim_create_autocmd("CursorHold", {
 		end
 	end,
 })
-
--- Give Neovim UI2 message popups the same rounded float treatment as CVIM.
-vim.api.nvim_create_autocmd("FileType", {
-	group = group,
-	pattern = "msg",
-	callback = function()
-		local win = vim.api.nvim_get_current_win()
-		if not vim.api.nvim_win_is_valid(win) then return end
-		local config = vim.api.nvim_win_get_config(win)
-		config.border = "rounded"
-		config.title = " Message "
-		config.title_pos = "left"
-		vim.api.nvim_win_set_config(win, config)
-	end,
-})
