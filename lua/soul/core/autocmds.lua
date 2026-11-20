@@ -56,7 +56,7 @@ vim.api.nvim_create_autocmd("CursorHold", {
 -- Route :messages to a centered floating window instead of the command line.
 local function show_messages()
 	local messages = vim.api.nvim_exec2("messages", { output = true }).output
-	local lines = vim.split(messages, "\\n", { plain = true })
+	local lines = vim.split(messages, "\n", { plain = true })
 	if #lines == 0 then
 		lines = { "No messages." }
 	end
