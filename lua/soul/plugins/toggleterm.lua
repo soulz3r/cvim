@@ -37,7 +37,8 @@ local M = {
 
                 for _, name in ipairs({ "bash.exe", "bash" }) do
                     local path = vim.fn.exepath(name)
-                    if path:lower():find("[/\\]git[/\\]") and is_executable(path) then
+                    local normalized = path:gsub("\\", "/"):lower()
+                    if normalized:find("/git/", 1, true) and is_executable(path) then
                         return path
                     end
                 end
@@ -49,14 +50,21 @@ local M = {
                     or shell:find("powershell", 1, true) ~= nil
             end
 
-            -- ToggleTerm expects shell to be a command string, not an executable plus args.
-            local function command_for(executable, arguments)
+            local function quote_argument(value)
                 if is_powershell_host() then
-                local quoted = '"' .. executable .. '"'
+                    return "'" .. value:gsub("'", "''") .. "'"
+                end
+
+                return '"' .. value:gsub('"', '""') .. '"'
+            end
+
+            -- ToggleTerm passes this command string to Neovim's configured shell.
+            local function command_for(executable, arguments)
+                local quoted = quote_argument(executable)
+                if is_powershell_host() then
                     return "& " .. quoted .. " " .. arguments
                 end
 
-                local quoted = '"' .. executable .. '"'
                 return quoted .. " " .. arguments
             end
 
@@ -67,7 +75,10 @@ local M = {
 
                 local bash = git_bash()
                 if bash then
-                    return command_for(bash, "--login -i")
+                    -- Explicitly load the user's custom Bash config, regardless of login profiles.
+                    local bashrc = vim.fn.expand("~/.bashrc"):gsub("\\", "/")
+                    local arguments = "--rcfile " .. quote_argument(bashrc) .. " -i"
+                    return command_for(bash, arguments)
                 end
 
                 for _, candidate in ipairs({ "pwsh.exe", "pwsh", "powershell.exe", "powershell" }) do
@@ -83,7 +94,7 @@ local M = {
             require("toggleterm").setup({
                 size = 15,
                 open_mapping = [[<C-\>]],
-                direction = "horizontal",
+                direction = "float",
                 start_in_insert = true,
                 insert_mappings = false,
                 terminal_mappings = false,
@@ -92,6 +103,17 @@ local M = {
                 close_on_exit = true,
                 shade_terminals = false,
                 shell = resolve_shell(),
+
+                float_opts = {
+                    border = "rounded",
+                    width = 50,
+                    height = 30,
+                    winblend = 0,
+                    highlights = {
+                        border = "FloatBorder",
+                        background = "NormalFloat",
+                    },
+                },
             })
         end,
     },
