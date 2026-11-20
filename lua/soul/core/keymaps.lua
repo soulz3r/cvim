@@ -1,17 +1,5 @@
 local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
-
--- Keep undo/redo feedback from lingering in the command line.
-map("n", "u", function()
-	local count = vim.v.count
-	vim.cmd("silent! normal! " .. (count > 0 and count or "") .. "u")
-end, opts)
-
-map("n", "<C-r>", function()
-	local count = vim.v.count
-	vim.cmd("silent! normal! " .. (count > 0 and count or "") .. "\x12")
-end, opts)
-
 map("n", "<C-h>", "<C-w>h", opts)
 map("n", "<C-j>", "<C-w>j", opts)
 map("n", "<C-k>", "<C-w>k", opts)
