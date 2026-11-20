@@ -65,29 +65,60 @@ local function parse_command(command_line)
   return parsed
 end
 
-local function run_buffer_command(command_line, title, original_win, original_buf)
-  local ok, err = pcall(vim.cmd, command_line)
+local function run_buffer_command(command_line, title)
+  local original_tab = vim.api.nvim_get_current_tabpage()
+  local original_win = vim.api.nvim_get_current_win()
+  local windows_before = {}
+  for _, win in ipairs(vim.api.nvim_list_wins()) do windows_before[win] = true end
+
+  local scratch = vim.api.nvim_create_buf(false, true)
+  local ok, temp_win = pcall(vim.api.nvim_open_win, scratch, false, {
+    relative = "editor",
+    row = vim.o.lines + 10,
+    col = 0,
+    width = 1,
+    height = 1,
+    style = "minimal",
+    focusable = true,
+  })
   if not ok then
-    vim.notify(tostring(err), vim.log.levels.ERROR)
+    vim.api.nvim_buf_delete(scratch, { force = true })
+    vim.notify("Could not create command output workspace: " .. tostring(temp_win), vim.log.levels.ERROR)
     return
   end
-  local result_buf = vim.api.nvim_get_current_buf()
-  if not vim.api.nvim_buf_is_valid(result_buf) or result_buf == original_buf then return end
-  local lines = vim.api.nvim_buf_get_lines(result_buf, 0, -1, false)
-  local filetype = vim.bo[result_buf].filetype
-  if vim.api.nvim_win_is_valid(original_win) then
-    if vim.api.nvim_get_current_win() ~= original_win then
-      local current_win = vim.api.nvim_get_current_win()
-      if vim.api.nvim_win_is_valid(current_win) and #vim.api.nvim_list_wins() > 1 then
-        pcall(vim.api.nvim_win_close, current_win, true)
-      end
-    end
-    if vim.api.nvim_win_is_valid(original_win) then
-      pcall(vim.api.nvim_win_set_buf, original_win, original_buf)
-      vim.api.nvim_set_current_win(original_win)
+
+  local ran, result = pcall(vim.api.nvim_win_call, temp_win, function()
+    vim.cmd(command_line)
+    local buf = vim.api.nvim_get_current_buf()
+    return {
+      lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false),
+      filetype = vim.bo[buf].filetype,
+    }
+  end)
+
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if not windows_before[win] and win ~= temp_win and vim.api.nvim_win_is_valid(win) then
+      pcall(vim.api.nvim_win_close, win, true)
     end
   end
-  M.open_output(title, lines, filetype)
+  if vim.api.nvim_win_is_valid(temp_win) then
+    pcall(vim.api.nvim_win_close, temp_win, true)
+  end
+  if vim.api.nvim_buf_is_valid(scratch) then
+    pcall(vim.api.nvim_buf_delete, scratch, { force = true })
+  end
+
+  if not ran then
+    vim.notify(tostring(result), vim.log.levels.ERROR)
+    return
+  end
+  if vim.api.nvim_tabpage_is_valid(original_tab) then
+    pcall(vim.api.nvim_set_current_tabpage, original_tab)
+  end
+  if vim.api.nvim_win_is_valid(original_win) then
+    pcall(vim.api.nvim_set_current_win, original_win)
+  end
+  M.open_output(title, result.lines, result.filetype)
 end
 
 local function handle_command(command_line)
@@ -102,10 +133,8 @@ local function handle_command(command_line)
   local command = parsed.cmd:lower()
   local args = parsed.args or {}
   if command == "checkhealth" or command == "help" or command == "h" or command == "man" then
-    local original_win = vim.api.nvim_get_current_win()
-    local original_buf = vim.api.nvim_get_current_buf()
     local title = command == "checkhealth" and "Checkhealth" or (command == "man" and "Man" or "Help")
-    vim.schedule(function() run_buffer_command(command_line, title, original_win, original_buf) end)
+    vim.schedule(function() run_buffer_command(command_line, title) end)
     return true
   end
   local limits = output_commands[command]
