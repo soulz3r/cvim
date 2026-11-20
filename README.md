@@ -54,8 +54,25 @@ No separate documentation directory is needed for this configuration. The README
 | <leader>e | Open Mini.files |
 | <leader>ff | Find files |
 | <leader>fg | Live grep |
+| <leader>fs | Search word under cursor |
 | <leader>fb | Find buffers |
-| <leader>fh | Search help tags |
+| <leader>fo | Recent files |
+| <leader>fc | Colorscheme picker |
+| <leader>fC | Commands |
+| <leader>fk | Keymaps |
+| <leader>fh | Help tags |
+| <leader>fp | Telescope picker list |
+| <leader>fr | Resume last picker |
+| <leader>fd | Diagnostics |
+| <leader>fq | Quickfix list |
+| <leader>fR | Registers |
+| <leader>fm | Marks |
+| <leader>fj | Jump list |
+| <leader>fO | Neovim options |
+| <leader>fH | Highlight groups |
+| <leader>gs | Git status |
+| <leader>gc | Git commits |
+| <leader>gb | Git branches |
 | <leader>L | Open Lazy.nvim |
 | Ctrl+\\ | Toggle the terminal |
 | ,, | Exit insert/visual mode; clear search in normal mode |
