@@ -197,7 +197,10 @@ end)
 test("UI2 initializes once and restores all handlers", function()
   local enable_calls = 0
   local disable_calls = 0
-  local original_ui2_show = function() end
+  local forwarded
+  local original_ui2_show = function(kind, ...)
+    forwarded = { kind, ... }
+  end
   local original_message_show = function() end
   local message_store = {
     msg_show = original_message_show,
@@ -233,6 +236,9 @@ test("UI2 initializes once and restores all handlers", function()
 
   assert(manager.install_notifications())
   assert(ui2.msg.msg_show ~= original_ui2_show)
+  ui2.msg.msg_show("echo", "bottom message", true)
+  assert(forwarded and forwarded[1] == "echo")
+  assert(forwarded[2] == "bottom message" and forwarded[3] == true)
   assert(manager.restore())
   assert(manager.is_enabled() == false)
   assert(disable_calls == 1)
