@@ -88,7 +88,7 @@ The leader key is Space. Mappings are grouped by purpose:
 | `<leader>nv` | Neovim version |
 | `<leader>nS` | Loaded scripts |
 | **Write: `<leader>w`** | |
-| `<leader>w` | Write current file |
+| `<leader>ww` | Write current file |
 | `<leader>wa` | Write all files |
 | `<leader>wq` | Write and quit current window |
 | **Quit: `<leader>q`** | |
