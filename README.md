@@ -96,9 +96,53 @@ The leader key is Space. Mappings are grouped by purpose:
 | `<leader>qa` | Quit all |
 | `<leader>qf` | Force quit current window |
 | `<leader>qA` | Force quit all |
+| **Buffers: `<leader>b`** | |
+| `<leader>bb` | List buffers |
+| `<leader>bn` | Next buffer |
+| `<leader>bp` | Previous buffer |
+| `<leader>bd` | Delete buffer |
+| `<leader>bD` | Force delete buffer |
+| `<leader>br` | Reload current file |
+| **Windows: `<leader>s`** | |
+| `<leader>sv` | Vertical split |
+| `<leader>sh` | Horizontal split |
+| `<leader>se` | Equalize split sizes |
+| `<leader>sx` | Close split |
+| `<leader>so` | Close other windows |
+| `<leader>sr` | Rotate windows |
+| **Tabs: `<leader>t`** | |
+| `<leader>tn` | New tab |
+| `<leader>tc` | Close tab |
+| `<leader>to` | Close other tabs |
+| `<leader>tl` | Next tab |
+| `<leader>th` | Previous tab |
+| `<leader>t1` to `t5` | Go to tab 1 to 5 |
+| **Diagnostics: `<leader>d`** | |
+| `<leader>dd` | Show line diagnostics |
+| `<leader>dn` / `dp` | Next / previous diagnostic |
+| `<leader>dq` | Send diagnostics to quickfix |
+| `<leader>dQ` | Send diagnostics to location list |
+| `<leader>dc` | Clear current buffer diagnostics |
+| **Code / LSP** | |
+| `gd` / `gD` | Definition / declaration |
+| `gi` / `gr` | Implementation / references |
+| `gy` | Type definition |
+| `K` | Hover documentation |
+| `<leader>ca` | Code action |
+| `<leader>cr` | Rename symbol |
+| `<leader>cf` | Format buffer |
+| `<leader>ci` / `cO` | Incoming / outgoing calls |
+| **UI toggles: `<leader>u`** | |
+| `<leader>uw` | Toggle line wrap |
+| `<leader>un` | Toggle line numbers |
+| `<leader>ur` | Toggle relative numbers |
+| `<leader>us` | Toggle spell checking |
+| `<leader>ul` | Toggle list characters |
+| `<leader>uc` | Toggle cursor line |
+| `<leader>uS` | Toggle sign column |
 | **Other** | |
 | `<leader>e` | Open Mini.files |
-| `<leader>cd` | Change working directory to current file |
+| `<leader>wd` | Change working directory to current file |
 | `<leader>L` | Open Lazy.nvim |
 | Ctrl+\\ | Toggle the floating terminal |
 | `,,` | Exit insert/visual mode; clear search in normal mode |
