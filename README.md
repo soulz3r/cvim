@@ -102,7 +102,7 @@ The leader key is Space. Mappings are grouped by purpose:
 | `<leader>bp` | Previous buffer |
 | `<leader>bd` | Delete buffer |
 | `<leader>bD` | Force delete buffer |
-| `<leader>br` | Reload current file |
+| `<leader>br` | Re-read current file (won’t discard unsaved changes) |
 | **Windows: `<leader>s`** | |
 | `<leader>sv` | Vertical split |
 | `<leader>sh` | Horizontal split |
@@ -132,6 +132,8 @@ The leader key is Space. Mappings are grouped by purpose:
 | `<leader>cr` | Rename symbol |
 | `<leader>cf` | Format buffer |
 | `<leader>ci` / `cO` | Incoming / outgoing calls |
+| `<leader>cs` / `cS` | Document / workspace symbols |
+| `<leader>ct` / `cT` | Type subtypes / supertypes |
 | **UI toggles: `<leader>u`** | |
 | `<leader>uw` | Toggle line wrap |
 | `<leader>un` | Toggle line numbers |
