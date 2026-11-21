@@ -77,7 +77,11 @@ function M.setup()
     M.message_generation = (M.message_generation or 0) + 1
 
     messages.msg_show = function(kind, ...)
+      M.message_generation = M.message_generation + 1
+      local current_generation = M.message_generation
+
       original_msg_show(kind, ...)
+
       local timeout = message_timeouts[kind]
       if timeout == nil then
         timeout = 2000
@@ -86,9 +90,6 @@ function M.setup()
       if timeout == false then
         return
       end
-
-      M.message_generation = M.message_generation + 1
-      local current_generation = M.message_generation
 
       vim.defer_fn(function()
         if current_generation == M.message_generation and type(messages.msg_clear) == "function" then
