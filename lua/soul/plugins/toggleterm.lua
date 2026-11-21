@@ -73,7 +73,6 @@ local M = {
         persist_mode = true,
         close_on_exit = true,
         shade_terminals = false,
-        shell = resolve_shell(),
 
         on_open = function(term)
           vim.wo[term.window].wrap = true
