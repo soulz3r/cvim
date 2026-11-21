@@ -94,6 +94,8 @@ local M = {
         shell = resolve_shell(),
 
         on_open = function(term)
+          vim.wo[term.window].wrap = true
+
           vim.keymap.set("t", ",,", [[<C-\><C-n>]], {
             buffer = term.bufnr,
             desc = "Exit terminal mode",
