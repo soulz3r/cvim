@@ -12,7 +12,7 @@ CVIM keeps core editing behavior, UI settings, diagnostics, messages, keymaps, t
 - Mini.ai, Mini.files, Mini.icons, Mini.pairs, and Mini.surround
 - Eyeliner for subtle character-jump hints
 - Telescope for file finding, live grep, buffers, and help
-- ToggleTerm with a floating terminal, using Git Bash on Windows and explicitly loading `D:/config/bash/.bashrc`, with `pwsh` and Windows PowerShell fallbacks
+- ToggleTerm with a floating terminal on `Alt+1`, using Git Bash on Windows and explicitly loading `D:/config/bash/.bashrc`, with `pwsh` and Windows PowerShell fallbacks
 - Tiny-cmdline with Neovim's built-in command-line completion and Neovim 0.12 UI2 support across Windows and Linux
 
 Tiny-cmdline is optional at startup and UI2 is initialized once through `soul.ui.ui2` on supported platforms, including Windows. If UI2 is unavailable or Tiny-cmdline setup fails, CVIM falls back to native command-line handling and restores the original UI2 message handlers.
@@ -120,9 +120,14 @@ The leader key is Space. Mappings are grouped by purpose:
 | `<leader>uS` | Toggle sign column |
 | **Other** | |
 | `<leader>e` | Open Mini.files |
-| `<leader>cd` | Change working directory to current file |
+| **Working directory: `<leader>c`** | |
+| `<leader>cd` | Change global cwd to current file directory |
+| `<leader>cr` | Change global cwd to Git project root |
+| `<leader>cl` | Set window-local cwd to current file directory |
+| `<leader>ct` | Set tab-local cwd to current file directory |
+| `<leader>cp` | Show current working directory |
 | `<leader>L` | Open Lazy.nvim |
-| Ctrl+\\ | Toggle the floating terminal |
+| Alt+1 | Toggle the floating terminal |
 | `,,` | Exit insert/visual mode; clear search in normal mode |
 
 Inside Mini.files, `g.` toggles hidden files, `g~` changes the working directory, and `gx` opens the selected entry with the system application.
