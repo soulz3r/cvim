@@ -1,23 +1,6 @@
 local M = {}
 
-local function float_config(title)
-  local width = math.min(math.max(1, vim.o.columns - 4), math.max(1, math.min(120, math.floor(vim.o.columns * 0.85))))
-  local height = math.min(
-    math.max(1, vim.o.lines - vim.o.cmdheight - 4),
-    math.max(1, math.min(32, math.floor((vim.o.lines - vim.o.cmdheight) * 0.78)))
-  )
-
-  return {
-    relative = "editor",
-    row = math.max(0, math.floor((vim.o.lines - vim.o.cmdheight - height) / 2)),
-    col = math.max(0, math.floor((vim.o.columns - width) / 2)),
-    width = width,
-    height = height,
-    border = "rounded",
-    title = " " .. title .. " ",
-    title_pos = "center",
-  }
-end
+local float = require("soul.ui.float")
 
 local function run_health_command(command_line)
   local util = vim.lsp.util
@@ -28,7 +11,7 @@ local function run_health_command(command_line)
   end
 
   util.open_floating_preview = function(contents, syntax, options, ...)
-    local config = float_config("Checkhealth")
+    local config = float.config("Checkhealth")
     options = vim.tbl_extend("force", options or {}, {
       width = config.width,
       height = config.height,
@@ -63,7 +46,7 @@ function M.open_output(title, output, filetype)
   vim.bo[buf].swapfile = false
   vim.bo[buf].filetype = filetype or "vim"
 
-  local win = vim.api.nvim_open_win(buf, true, vim.tbl_extend("force", float_config(title), { style = "minimal" }))
+  local win = vim.api.nvim_open_win(buf, true, vim.tbl_extend("force", float.config(title), { style = "minimal" }))
   vim.wo[win].wrap = false
   vim.wo[win].cursorline = false
   vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = buf, silent = true })
