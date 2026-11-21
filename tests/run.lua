@@ -282,6 +282,37 @@ test("health float interception applies shared geometry and restores API", funct
   vim.notify = original_notify
 end)
 
+test("inspection commands do not intercept highlight mutations", function()
+  local messages = require("soul.ui.messages")
+  local original_exec2 = vim.api.nvim_exec2
+  local original_schedule = vim.schedule
+  local original_open_output = messages.open_output
+  local executed, opened = {}, {}
+
+  vim.api.nvim_exec2 = function(command, options)
+    table.insert(executed, { command = command, options = options })
+    return { output = "highlight output" }
+  end
+  vim.schedule = function(callback)
+    callback()
+  end
+  messages.open_output = function(title, output)
+    table.insert(opened, { title = title, output = output })
+  end
+
+  assert(messages._handle_command("highlight Normal"))
+  assert(#executed == 1 and executed[1].command == "highlight Normal")
+  assert(#opened == 1 and opened[1].output == "highlight output")
+
+  assert(not messages._handle_command("highlight clear"))
+  assert(not messages._handle_command("highlight default"))
+  assert(#executed == 1, "mutating highlight commands must not be executed by the output handler")
+
+  vim.api.nvim_exec2 = original_exec2
+  vim.schedule = original_schedule
+  messages.open_output = original_open_output
+end)
+
 test("help and Man command workspaces clean up temporary windows", function()
   local messages = require("soul.ui.messages")
   local tab = vim.api.nvim_get_current_tabpage()
