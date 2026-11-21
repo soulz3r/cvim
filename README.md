@@ -110,31 +110,6 @@ The leader key is Space. Mappings are grouped by purpose:
 | `<leader>sx` | Close split |
 | `<leader>so` | Close other windows |
 | `<leader>sr` | Rotate windows |
-| **Tabs: `<leader>t`** | |
-| `<leader>tn` | New tab |
-| `<leader>tc` | Close tab |
-| `<leader>to` | Close other tabs |
-| `<leader>tl` | Next tab |
-| `<leader>th` | Previous tab |
-| `<leader>t1` to `t5` | Go to tab 1 to 5 |
-| **Diagnostics: `<leader>d`** | |
-| `<leader>dd` | Show line diagnostics |
-| `<leader>dn` / `dp` | Next / previous diagnostic |
-| `<leader>dq` | Send diagnostics to quickfix |
-| `<leader>dQ` | Send diagnostics to location list |
-| `<leader>dc` | Clear current buffer diagnostics |
-| **Code / LSP: `<leader>c`** | |
-| `<leader>ca` | Code action |
-| `<leader>cd` / `cD` | Definition / declaration |
-| `<leader>ci` | Implementation |
-| `<leader>cr` | Find references |
-| `<leader>cn` | Rename symbol |
-| `<leader>ct` | Type definition |
-| `<leader>cf` | Format buffer |
-| `<leader>ch` | Hover documentation |
-| `<leader>cs` / `cS` | Document / workspace symbols |
-| `<leader>cI` / `cO` | Incoming / outgoing calls |
-| Neovim defaults | `gd`, `gD`, `grr`, `gri`, `grn`, `grt`, `K` when LSP is attached |
 | **UI toggles: `<leader>u`** | |
 | `<leader>uw` | Toggle line wrap |
 | `<leader>un` | Toggle line numbers |
@@ -145,7 +120,7 @@ The leader key is Space. Mappings are grouped by purpose:
 | `<leader>uS` | Toggle sign column |
 | **Other** | |
 | `<leader>e` | Open Mini.files |
-| `<leader>wd` | Change working directory to current file |
+| `<leader>cd` | Change working directory to current file |
 | `<leader>L` | Open Lazy.nvim |
 | Ctrl+\\ | Toggle the floating terminal |
 | `,,` | Exit insert/visual mode; clear search in normal mode |
