@@ -43,3 +43,30 @@ jobs:
           nvim --headless -u NONE \
             -c "lua local ok, err = pcall(dofile, 'tests/startup.lua'); if not ok then print(err); vim.cmd('cquit 1') end" \
             -c "qa!"
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Neovim stable
+        shell: pwsh
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP "neovim.zip"
+          $url = "https://github.com/neovim/neovim/releases/download/stable/nvim-win64.zip"
+          Invoke-WebRequest -Uri $url -OutFile $archive
+          Expand-Archive -Path $archive -DestinationPath $env:RUNNER_TEMP -Force
+          "$env:RUNNER_TEMP\nvim-win64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Verify native UI2 support
+        shell: pwsh
+        run: |
+          nvim --headless -u NONE -c "lua local ok, ui2 = pcall(require, 'vim._core.ui2'); assert(ok and type(ui2.enable) == 'function', 'Neovim UI2 is unavailable on Windows'); local enabled, err = pcall(ui2.enable, { enable = true, msg = { targets = 'cmd' } }); assert(enabled, tostring(err)); ui2.enable({ enable = false })" -c "qa!"
+
+      - name: Run headless regression checks
+        run: nvim --headless -u NONE -c "lua dofile('tests/run.lua')" -c "qa!"
+
+      - name: Run isolated startup smoke test
+        run: nvim --headless -u NONE -c "lua dofile('tests/startup.lua')" -c "qa!"
