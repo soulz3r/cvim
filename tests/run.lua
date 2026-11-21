@@ -281,17 +281,21 @@ test("UI2 messages use severity-based timeouts", function()
   message_store.msg_show("wmsg", "warning")
   message_store.msg_show("emsg", "error")
   message_store.msg_show("return_prompt", "press enter")
+
   assert(delays[1] == 2000)
   assert(delays[2] == 4000)
   assert(delays[3] == 6000)
   assert(#delays == 3, "interactive prompts must not be auto-cleared")
 
   callbacks[1]()
-  assert(clear_calls == 0, "an older timer must not clear a newer message")
   callbacks[2]()
-  assert(clear_calls == 0, "an older timer must not clear a newer message")
   callbacks[3]()
-  assert(clear_calls == 1, "the latest error should clear after six seconds")
+  assert(clear_calls == 0, "an older timer must not clear a newer interactive prompt")
+
+  message_store.msg_show("echo", "new information")
+  assert(delays[4] == 2000)
+  callbacks[4]()
+  assert(clear_calls == 1, "the newest timed message should clear after its timeout")
 
   assert(manager.restore())
   vim.defer_fn = original_defer
