@@ -16,8 +16,14 @@ local function resolve_pwsh()
     return configured
   end
 
-  local executable = fn.exepath("pwsh")
-  return executable ~= "" and executable or "pwsh"
+  for _, name in ipairs({ "pwsh", "powershell.exe", "powershell" }) do
+    local executable = fn.exepath(name)
+    if executable ~= "" then
+      return executable
+    end
+  end
+
+  return "pwsh"
 end
 
 -- Resolve PowerShell only when Windows actually needs a shell.
