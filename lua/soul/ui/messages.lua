@@ -246,6 +246,10 @@ local function handle_command(command_line)
 end
 
 function M.setup()
+  if M.setup_done then
+    return true
+  end
+
   local ui2 = require("soul.ui.ui2")
   local enabled, err = ui2.setup()
   if not enabled then
@@ -279,6 +283,9 @@ function M.setup()
     noremap = true,
     desc = "Open inspectable command output in a floating window",
   })
+
+  M.setup_done = true
+  return true
 end
 
 -- Kept private to CVIM; exposed for focused regression coverage.
