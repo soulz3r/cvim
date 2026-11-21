@@ -82,6 +82,10 @@ test("keymaps are registered and grouped", function()
     " so",
     " sr",
     " cd",
+    " cr",
+    " cl",
+    " ct",
+    " cp",
     " uw",
     " un",
     " ur",
@@ -190,6 +194,7 @@ test("ToggleTerm reuses PowerShell when Git Bash is unavailable", function()
 
   require("soul.plugins.toggleterm")[1].config()
   assert(captured and captured.shell == "powershell.exe")
+  assert(captured.open_mapping == [[<M-1>]])
 
   vim.fn.has = original_has
   vim.fn.executable = original_executable
