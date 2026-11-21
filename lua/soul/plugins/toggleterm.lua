@@ -80,13 +80,8 @@ local M = {
           return command_for(bash, arguments)
         end
 
-        for _, candidate in ipairs({ "pwsh.exe", "pwsh", "powershell.exe", "powershell" }) do
-          local shell = vim.fn.exepath(candidate)
-          if shell ~= "" then
-            return command_for(shell, "-NoLogo -NoExit")
-          end
-        end
-
+        -- options.lua already selected pwsh or Windows PowerShell as the host shell.
+        -- Reuse it instead of starting a nested PowerShell process.
         return vim.o.shell
       end
 
