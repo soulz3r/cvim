@@ -92,7 +92,7 @@ The leader key is Space. Mappings are grouped by purpose:
 | `<leader>wa` | Write all files |
 | `<leader>wq` | Write and quit current window |
 | **Quit: `<leader>q`** | |
-| `<leader>q` | Quit current window |
+| `<leader>qq` | Quit current window |
 | `<leader>qa` | Quit all |
 | `<leader>qf` | Force quit current window |
 | `<leader>qA` | Force quit all |
