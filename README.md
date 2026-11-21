@@ -51,33 +51,57 @@ No separate documentation directory is needed for this configuration. The README
 
 ## Key mappings
 
+The leader key is Space. Mappings are grouped by purpose:
+
 | Mapping | Action |
 |---|---|
-| <leader>e | Open Mini.files |
-| <leader>ff | Find files |
-| <leader>fg | Live grep |
-| <leader>fs | Search word under cursor |
-| <leader>fb | Find buffers |
-| <leader>fo | Recent files |
-| <leader>fc | Colorscheme picker |
-| <leader>fC | Commands |
-| <leader>fk | Keymaps |
-| <leader>fh | Help tags |
-| <leader>fp | Telescope picker list |
-| <leader>fr | Resume last picker |
-| <leader>fd | Diagnostics |
-| <leader>fq | Quickfix list |
-| <leader>fR | Registers |
-| <leader>fm | Marks |
-| <leader>fj | Jump list |
-| <leader>fO | Neovim options |
-| <leader>fH | Highlight groups |
-| <leader>gs | Git status |
-| <leader>gc | Git commits |
-| <leader>gb | Git branches |
-| <leader>L | Open Lazy.nvim |
-| Ctrl+\\ | Toggle the terminal |
-| ,, | Exit insert/visual mode; clear search in normal mode |
+| **Telescope: `<leader>f`** | |
+| `<leader>ff` | Find files |
+| `<leader>fg` | Live grep |
+| `<leader>fs` | Search word under cursor |
+| `<leader>fF` | Search current buffer |
+| `<leader>fb` | Find buffers |
+| `<leader>fo` | Recent files |
+| `<leader>fc` | Colorscheme picker |
+| `<leader>fC` | Commands |
+| `<leader>fk` | Keymaps |
+| `<leader>fh` | Help tags |
+| `<leader>fp` | Telescope picker list |
+| `<leader>fr` | Resume last picker |
+| `<leader>fR` | Registers |
+| `<leader>fm` | Marks |
+| `<leader>fj` | Jump list |
+| `<leader>fO` | Neovim options |
+| `<leader>fH` | Highlight groups |
+| `<leader>fA` | Autocommands |
+| `<leader>fT` | Filetypes |
+| `<leader>f:` | Command history |
+| `<leader>f/` | Search history |
+| `<leader>fq` | Quickfix list |
+| `<leader>fQ` | Quickfix history |
+| `<leader>fl` | Location list |
+| **Neovim: `<leader>n`** | |
+| `<leader>nm` | Message history |
+| `<leader>nc` | Checkhealth |
+| `<leader>nC` | Open config `init.lua` |
+| `<leader>nr` | Reload config `init.lua` |
+| `<leader>nv` | Neovim version |
+| `<leader>nS` | Loaded scripts |
+| **Write: `<leader>w`** | |
+| `<leader>w` | Write current file |
+| `<leader>wa` | Write all files |
+| `<leader>wq` | Write and quit current window |
+| **Quit: `<leader>q`** | |
+| `<leader>q` | Quit current window |
+| `<leader>qa` | Quit all |
+| `<leader>qf` | Force quit current window |
+| `<leader>qA` | Force quit all |
+| **Other** | |
+| `<leader>e` | Open Mini.files |
+| `<leader>cd` | Change working directory to current file |
+| `<leader>L` | Open Lazy.nvim |
+| Ctrl+\\ | Toggle the floating terminal |
+| `,,` | Exit insert/visual mode; clear search in normal mode |
 
 Inside Mini.files, `g.` toggles hidden files, `g~` changes the working directory, and `gx` opens the selected entry with the system application.
 
