@@ -74,6 +74,79 @@ test("plugin specifications and lockfile agree", function()
   assert(lockfile["tiny-cmdline.nvim"] and lockfile["toggleterm.nvim"] and not lockfile["blink.cmp"])
 end)
 
+test("PowerShell resolution falls back to Windows PowerShell", function()
+  local original_executable = vim.fn.executable
+  local original_exepath = vim.fn.exepath
+  local original_pwsh = vim.env.PWSH
+  local original_paths = package.loaded["soul.core.helpers.paths"]
+  local expected = "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+
+  vim.env.PWSH = nil
+  vim.fn.executable = function()
+    return 0
+  end
+  vim.fn.exepath = function(name)
+    return name == "powershell.exe" and expected or ""
+  end
+  package.loaded["soul.core.helpers.paths"] = nil
+
+  local paths = require("soul.core.helpers.paths")
+  assert(paths.pwsh == expected)
+
+  vim.fn.executable = original_executable
+  vim.fn.exepath = original_exepath
+  vim.env.PWSH = original_pwsh
+  package.loaded["soul.core.helpers.paths"] = original_paths
+end)
+
+test("ToggleTerm reuses PowerShell when Git Bash is unavailable", function()
+  local original_has = vim.fn.has
+  local original_executable = vim.fn.executable
+  local original_exepath = vim.fn.exepath
+  local original_shell = vim.o.shell
+  local original_program_files = vim.env.ProgramFiles
+  local original_program_files_x86 = vim.env["ProgramFiles(x86)"]
+  local original_local_app_data = vim.env.LOCALAPPDATA
+  local original_preload = package.preload.toggleterm
+  local original_loaded = package.loaded.toggleterm
+  local captured
+
+  vim.fn.has = function(feature)
+    return feature == "win32" and 1 or original_has(feature)
+  end
+  vim.fn.executable = function()
+    return 0
+  end
+  vim.fn.exepath = function()
+    return ""
+  end
+  vim.o.shell = "powershell.exe"
+  vim.env.ProgramFiles = nil
+  vim.env["ProgramFiles(x86)"] = nil
+  vim.env.LOCALAPPDATA = nil
+  package.loaded.toggleterm = nil
+  package.preload.toggleterm = function()
+    return {
+      setup = function(options)
+        captured = options
+      end,
+    }
+  end
+
+  require("soul.plugins.toggleterm")[1].config()
+  assert(captured and captured.shell == "powershell.exe")
+
+  vim.fn.has = original_has
+  vim.fn.executable = original_executable
+  vim.fn.exepath = original_exepath
+  vim.o.shell = original_shell
+  vim.env.ProgramFiles = original_program_files
+  vim.env["ProgramFiles(x86)"] = original_program_files_x86
+  vim.env.LOCALAPPDATA = original_local_app_data
+  package.preload.toggleterm = original_preload
+  package.loaded.toggleterm = original_loaded
+end)
+
 test("UI2 remains available on Windows", function()
   local original_has = vim.fn.has
   local ui2 = {
