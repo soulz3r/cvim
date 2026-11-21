@@ -40,7 +40,7 @@ function M.setup()
   map("n", "<leader>wq", "<cmd>wq<CR>", described("Write and quit"))
 
   -- Quit: <leader>q...
-  map("n", "<leader>q", "<cmd>quit<CR>", described("Quit window"))
+  map("n", "<leader>qq", "<cmd>quit<CR>", described("Quit window"))
   map("n", "<leader>qa", "<cmd>quitall<CR>", described("Quit all"))
   map("n", "<leader>qf", "<cmd>quit!<CR>", described("Force quit window"))
   map("n", "<leader>qA", "<cmd>quitall!<CR>", described("Force quit all"))
