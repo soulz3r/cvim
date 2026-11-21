@@ -45,7 +45,22 @@ function M.setup()
   end
   if platform.is_windows then
     vim.opt.shell = paths.pwsh
-    vim.opt.shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command"
+
+    local shell_name = vim.fn.fnamemodify(paths.pwsh, ":t"):lower()
+    local shell_flags = table.concat({
+      "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command",
+      "[Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new();",
+      "$PSDefaultParameterValues['Out-File:Encoding']='utf8';",
+    }, " ")
+
+    if shell_name == "pwsh" or shell_name == "pwsh.exe" then
+      shell_flags = shell_flags
+        .. " $PSStyle.OutputRendering = 'PlainText'; $__SuppressAnsiEscapeSequences = 1;"
+    end
+
+    vim.opt.shellcmdflag = shell_flags
+    vim.opt.shellpipe = "> %s 2>&1"
+    vim.opt.shellredir = "> %s 2>&1"
     vim.opt.shellquote = ""
     vim.opt.shellxquote = ""
   end
