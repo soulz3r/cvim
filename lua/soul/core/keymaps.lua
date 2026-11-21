@@ -59,13 +59,94 @@ function M.setup()
   map("n", "<leader>nv", "<cmd>version<CR>", described("Neovim version"))
   map("n", "<leader>nS", "<cmd>scriptnames<CR>", described("Loaded scripts"))
 
-  map("n", "<leader>cd", function()
+  -- Buffers: <leader>b...
+  map("n", "<leader>bb", "<cmd>buffers<CR>", described("List buffers"))
+  map("n", "<leader>bn", "<cmd>bnext<CR>", described("Next buffer"))
+  map("n", "<leader>bp", "<cmd>bprevious<CR>", described("Previous buffer"))
+  map("n", "<leader>bd", "<cmd>bdelete<CR>", described("Delete buffer"))
+  map("n", "<leader>bD", "<cmd>bdelete!<CR>", described("Force delete buffer"))
+  map("n", "<leader>br", "<cmd>edit!<CR>", described("Reload current file"))
+
+  -- Windows: <leader>s...
+  map("n", "<leader>sv", "<cmd>vsplit<CR>", described("Split window vertically"))
+  map("n", "<leader>sh", "<cmd>split<CR>", described("Split window horizontally"))
+  map("n", "<leader>se", "<C-w>=", described("Equalize window sizes"))
+  map("n", "<leader>so", "<cmd>only<CR>", described("Close other windows"))
+  map("n", "<leader>sr", "<C-w>r", described("Rotate windows"))
+  map("n", "<leader>sx", "<cmd>close<CR>", described("Close split"))
+
+  -- Tabs: <leader>t...
+  map("n", "<leader>tn", "<cmd>tabnew<CR>", described("New tab"))
+  map("n", "<leader>tc", "<cmd>tabclose<CR>", described("Close tab"))
+  map("n", "<leader>to", "<cmd>tabonly<CR>", described("Close other tabs"))
+  map("n", "<leader>tl", "<cmd>tabnext<CR>", described("Next tab"))
+  map("n", "<leader>th", "<cmd>tabprevious<CR>", described("Previous tab"))
+  map("n", "<leader>t1", "1gt", described("Go to tab 1"))
+  map("n", "<leader>t2", "2gt", described("Go to tab 2"))
+  map("n", "<leader>t3", "3gt", described("Go to tab 3"))
+  map("n", "<leader>t4", "4gt", described("Go to tab 4"))
+  map("n", "<leader>t5", "5gt", described("Go to tab 5"))
+
+  -- Diagnostics: <leader>d...
+  map("n", "<leader>dd", vim.diagnostic.open_float, described("Show line diagnostics"))
+  map("n", "<leader>dn", function()
+    vim.diagnostic.jump({ count = 1 })
+  end, described("Next diagnostic"))
+  map("n", "<leader>dp", function()
+    vim.diagnostic.jump({ count = -1 })
+  end, described("Previous diagnostic"))
+  map("n", "<leader>dq", vim.diagnostic.setqflist, described("Diagnostics to quickfix"))
+  map("n", "<leader>dQ", vim.diagnostic.setloclist, described("Diagnostics to location list"))
+  map("n", "<leader>dc", function()
+    vim.diagnostic.reset(nil, 0)
+  end, described("Clear buffer diagnostics"))
+
+  -- LSP / code: standard navigation plus <leader>c...
+  map("n", "gd", vim.lsp.buf.definition, described("Go to definition"))
+  map("n", "gD", vim.lsp.buf.declaration, described("Go to declaration"))
+  map("n", "gi", vim.lsp.buf.implementation, described("Go to implementation"))
+  map("n", "gr", vim.lsp.buf.references, described("Find references"))
+  map("n", "gy", vim.lsp.buf.type_definition, described("Go to type definition"))
+  map("n", "K", vim.lsp.buf.hover, described("Hover documentation"))
+  map("n", "<leader>ca", vim.lsp.buf.code_action, described("Code action"))
+  map("n", "<leader>cr", vim.lsp.buf.rename, described("Rename symbol"))
+  map("n", "<leader>cf", function()
+    vim.lsp.buf.format({ async = true })
+  end, described("Format buffer"))
+  map("n", "<leader>ci", vim.lsp.buf.incoming_calls, described("Incoming calls"))
+  map("n", "<leader>cO", vim.lsp.buf.outgoing_calls, described("Outgoing calls"))
+
+  -- UI toggles: <leader>u...
+  map("n", "<leader>uw", function()
+    vim.wo.wrap = not vim.wo.wrap
+  end, described("Toggle line wrap"))
+  map("n", "<leader>un", function()
+    vim.wo.number = not vim.wo.number
+  end, described("Toggle line numbers"))
+  map("n", "<leader>ur", function()
+    vim.wo.relativenumber = not vim.wo.relativenumber
+  end, described("Toggle relative numbers"))
+  map("n", "<leader>us", function()
+    vim.wo.spell = not vim.wo.spell
+  end, described("Toggle spell checking"))
+  map("n", "<leader>ul", function()
+    vim.wo.list = not vim.wo.list
+  end, described("Toggle list characters"))
+  map("n", "<leader>uc", function()
+    vim.wo.cursorline = not vim.wo.cursorline
+  end, described("Toggle cursor line"))
+  map("n", "<leader>uS", function()
+    vim.wo.signcolumn = vim.wo.signcolumn == "no" and "yes" or "no"
+  end, described("Toggle sign column"))
+
+  -- Working directory.
+  map("n", "<leader>wd", function()
     local file = vim.api.nvim_buf_get_name(0)
     if file == "" then
       return
     end
     vim.cmd.cd(vim.fn.fnameescape(vim.fn.fnamemodify(file, ":h")))
-  end, opts)
+  end, described("Change to file directory"))
 
   map({ "i", "x" }, ",,", "<Esc>", opts)
   map("n", ",,", "<cmd>nohlsearch<CR>", opts)
