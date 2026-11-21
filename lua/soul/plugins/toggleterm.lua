@@ -57,7 +57,6 @@ local M = {
         return '"' .. value:gsub('"', '""') .. '"'
       end
 
-      -- ToggleTerm passes this command string to Neovim's configured shell.
       local function command_for(executable, arguments)
         local quoted = quote_argument(executable)
         if is_powershell_host() then
@@ -74,20 +73,16 @@ local M = {
 
         local bash = git_bash()
         if bash then
-          -- Explicitly load the user's custom Bash config, regardless of login profiles.
           local bashrc = "/d/config/bash/.bashrc"
           local arguments = "--rcfile " .. quote_argument(bashrc) .. " -i"
           return command_for(bash, arguments)
         end
 
-        -- options.lua already selected pwsh or Windows PowerShell as the host shell.
-        -- Reuse it instead of starting a nested PowerShell process.
         return vim.o.shell
       end
 
       require("toggleterm").setup({
         size = 15,
-        open_mapping = [[<C-\>]],
         direction = "float",
         start_in_insert = true,
         insert_mappings = false,
@@ -99,7 +94,7 @@ local M = {
         shell = resolve_shell(),
 
         on_open = function(term)
-          vim.keymap.set("t", ",,", [[<C-\><C-n>]], {
+          vim.keymap.set("t", ",,", [[<C-\\><C-n>]], {
             buffer = term.bufnr,
             desc = "Exit terminal mode",
             silent = true,
@@ -124,6 +119,20 @@ local M = {
             background = "NormalFloat",
           },
         },
+      })
+
+      local Terminal = require("toggleterm.terminal").Terminal
+      local terminal = Terminal:new({
+        direction = "float",
+        hidden = true,
+      })
+
+      vim.keymap.set({ "n", "t" }, "<C-\\>", function()
+        terminal:toggle()
+      end, {
+        desc = "Toggle floating terminal",
+        noremap = true,
+        silent = true,
       })
     end,
   },
