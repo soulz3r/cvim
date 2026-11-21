@@ -221,6 +221,14 @@ local function handle_command(command_line)
     return true
   end
 
+  -- These forms mutate highlight state; leave them to Neovim.
+  if command == "highlight" then
+    local action = (args[1] or ""):lower()
+    if action == "clear" or action == "default" then
+      return false
+    end
+  end
+
   local limits = output_commands[command]
   if not limits or #args < limits.min or #args > limits.max then
     return false
@@ -276,5 +284,6 @@ end
 -- Kept private to CVIM; exposed for focused regression coverage.
 M._run_health_command = run_health_command
 M._run_buffer_command = run_buffer_command
+M._handle_command = handle_command
 
 return M
