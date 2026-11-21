@@ -24,6 +24,7 @@ Mini.notify is intentionally excluded. Error and warning messages use native not
 CVIM uses a transparent UI with visible, rounded borders:
 
 - Floating windows, diagnostics, popup menus, and Lazy.nvim use rounded borders.
+- CVIM-owned output and diagnostic floats share responsive width and height limits, recalculated when the editor is resized.
 - Border foregrounds come from the active colorscheme and remain visible.
 - Border, float, title, footer, and popup backgrounds are forced to NONE, preventing a colored strip or halo around the outline.
 - Popup blending is disabled; selection colors and syntax highlighting remain intact.
@@ -39,7 +40,7 @@ Neovim does not provide one global margin or padding option for every window. Th
 ## Structure
 
 - `lua/soul/core`: editing options, platform integration, autocmds, and keymaps
-- `lua/soul/ui`: global presentation defaults, diagnostics, UI2 initialization, and message/output UI
+- `lua/soul/ui`: global presentation defaults, shared float geometry, diagnostics, UI2 initialization, and message/output UI
 - `lua/soul/plugins`: plugin specifications and colorscheme loading
 - `tests`: headless regression checks and isolated startup smoke test
 - `.github/workflows`: automated formatting, syntax, and smoke checks
