@@ -75,49 +75,6 @@ function M.setup()
   map("n", "<leader>sr", "<C-w>r", described("Rotate windows"))
   map("n", "<leader>sx", "<cmd>close<CR>", described("Close split"))
 
-  -- Tabs: <leader>t...
-  map("n", "<leader>tn", "<cmd>tabnew<CR>", described("New tab"))
-  map("n", "<leader>tc", "<cmd>tabclose<CR>", described("Close tab"))
-  map("n", "<leader>to", "<cmd>tabonly<CR>", described("Close other tabs"))
-  map("n", "<leader>tl", "<cmd>tabnext<CR>", described("Next tab"))
-  map("n", "<leader>th", "<cmd>tabprevious<CR>", described("Previous tab"))
-  map("n", "<leader>t1", "1gt", described("Go to tab 1"))
-  map("n", "<leader>t2", "2gt", described("Go to tab 2"))
-  map("n", "<leader>t3", "3gt", described("Go to tab 3"))
-  map("n", "<leader>t4", "4gt", described("Go to tab 4"))
-  map("n", "<leader>t5", "5gt", described("Go to tab 5"))
-
-  -- Diagnostics: <leader>d...
-  map("n", "<leader>dd", vim.diagnostic.open_float, described("Show line diagnostics"))
-  map("n", "<leader>dn", function()
-    vim.diagnostic.jump({ count = 1 })
-  end, described("Next diagnostic"))
-  map("n", "<leader>dp", function()
-    vim.diagnostic.jump({ count = -1 })
-  end, described("Previous diagnostic"))
-  map("n", "<leader>dq", vim.diagnostic.setqflist, described("Diagnostics to quickfix"))
-  map("n", "<leader>dQ", vim.diagnostic.setloclist, described("Diagnostics to location list"))
-  map("n", "<leader>dc", function()
-    vim.diagnostic.reset(nil, 0)
-  end, described("Clear buffer diagnostics"))
-
-  -- LSP / code: <leader>c...
-  map("n", "<leader>ca", vim.lsp.buf.code_action, described("Code action"))
-  map("n", "<leader>cd", vim.lsp.buf.definition, described("Go to definition"))
-  map("n", "<leader>cD", vim.lsp.buf.declaration, described("Go to declaration"))
-  map("n", "<leader>ci", vim.lsp.buf.implementation, described("Go to implementation"))
-  map("n", "<leader>cr", vim.lsp.buf.references, described("Find references"))
-  map("n", "<leader>cn", vim.lsp.buf.rename, described("Rename symbol"))
-  map("n", "<leader>ct", vim.lsp.buf.type_definition, described("Go to type definition"))
-  map("n", "<leader>cf", function()
-    vim.lsp.buf.format({ async = true })
-  end, described("Format buffer"))
-  map("n", "<leader>ch", vim.lsp.buf.hover, described("Hover documentation"))
-  map("n", "<leader>cs", vim.lsp.buf.document_symbol, described("Document symbols"))
-  map("n", "<leader>cS", vim.lsp.buf.workspace_symbol, described("Workspace symbols"))
-  map("n", "<leader>cI", vim.lsp.buf.incoming_calls, described("Incoming calls"))
-  map("n", "<leader>cO", vim.lsp.buf.outgoing_calls, described("Outgoing calls"))
-
   -- UI toggles: <leader>u...
   map("n", "<leader>uw", function()
     vim.wo.wrap = not vim.wo.wrap
@@ -142,7 +99,7 @@ function M.setup()
   end, described("Toggle sign column"))
 
   -- Working directory.
-  map("n", "<leader>wd", function()
+  map("n", "<leader>cd", function()
     local file = vim.api.nvim_buf_get_name(0)
     if file == "" then
       return
