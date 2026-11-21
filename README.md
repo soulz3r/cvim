@@ -123,17 +123,18 @@ The leader key is Space. Mappings are grouped by purpose:
 | `<leader>dq` | Send diagnostics to quickfix |
 | `<leader>dQ` | Send diagnostics to location list |
 | `<leader>dc` | Clear current buffer diagnostics |
-| **Code / LSP** | |
-| `gd` / `gD` | Definition / declaration |
-| `gi` / `gr` | Implementation / references |
-| `gy` | Type definition |
-| `K` | Hover documentation |
+| **Code / LSP: `<leader>c`** | |
 | `<leader>ca` | Code action |
-| `<leader>cr` | Rename symbol |
+| `<leader>cd` / `cD` | Definition / declaration |
+| `<leader>ci` | Implementation |
+| `<leader>cr` | Find references |
+| `<leader>cn` | Rename symbol |
+| `<leader>ct` | Type definition |
 | `<leader>cf` | Format buffer |
-| `<leader>ci` / `cO` | Incoming / outgoing calls |
+| `<leader>ch` | Hover documentation |
 | `<leader>cs` / `cS` | Document / workspace symbols |
-| `<leader>ct` / `cT` | Type subtypes / supertypes |
+| `<leader>cI` / `cO` | Incoming / outgoing calls |
+| Neovim defaults | `gd`, `gD`, `grr`, `gri`, `grn`, `grt`, `K` when LSP is attached |
 | **UI toggles: `<leader>u`** | |
 | `<leader>uw` | Toggle line wrap |
 | `<leader>un` | Toggle line numbers |
