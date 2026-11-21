@@ -65,7 +65,7 @@ function M.setup()
   map("n", "<leader>bp", "<cmd>bprevious<CR>", described("Previous buffer"))
   map("n", "<leader>bd", "<cmd>bdelete<CR>", described("Delete buffer"))
   map("n", "<leader>bD", "<cmd>bdelete!<CR>", described("Force delete buffer"))
-  map("n", "<leader>br", "<cmd>edit!<CR>", described("Reload current file"))
+  map("n", "<leader>br", "<cmd>edit<CR>", described("Re-read current file"))
 
   -- Windows: <leader>s...
   map("n", "<leader>sv", "<cmd>vsplit<CR>", described("Split window vertically"))
@@ -115,6 +115,14 @@ function M.setup()
   end, described("Format buffer"))
   map("n", "<leader>ci", vim.lsp.buf.incoming_calls, described("Incoming calls"))
   map("n", "<leader>cO", vim.lsp.buf.outgoing_calls, described("Outgoing calls"))
+  map("n", "<leader>cs", vim.lsp.buf.document_symbol, described("Document symbols"))
+  map("n", "<leader>cS", vim.lsp.buf.workspace_symbol, described("Workspace symbols"))
+  map("n", "<leader>ct", function()
+    vim.lsp.buf.typehierarchy("subtypes")
+  end, described("Type subtypes"))
+  map("n", "<leader>cT", function()
+    vim.lsp.buf.typehierarchy("supertypes")
+  end, described("Type supertypes"))
 
   -- UI toggles: <leader>u...
   map("n", "<leader>uw", function()
