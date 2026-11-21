@@ -87,7 +87,7 @@ local M = {
 
       require("toggleterm").setup({
         size = 15,
-        open_mapping = [[<C-\>]],
+        open_mapping = [[<M-1>]],
         direction = "float",
         start_in_insert = true,
         insert_mappings = false,
