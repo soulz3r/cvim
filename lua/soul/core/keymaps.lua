@@ -35,7 +35,7 @@ function M.setup()
   map("x", "<M-k>", ":m '<-2<CR>gv=gv", opts)
 
   -- Write: <leader>w...
-  map("n", "<leader>w", "<cmd>write<CR>", described("Write file"))
+  map("n", "<leader>ww", "<cmd>write<CR>", described("Write file"))
   map("n", "<leader>wa", "<cmd>wall<CR>", described("Write all files"))
   map("n", "<leader>wq", "<cmd>wq<CR>", described("Write and quit"))
 
