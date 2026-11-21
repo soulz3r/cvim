@@ -44,42 +44,24 @@ local M = {
         end
       end
 
-      local function is_powershell_host()
-        local shell = vim.o.shell:lower():gsub("\\", "/")
-        return shell:find("pwsh", 1, true) ~= nil or shell:find("powershell", 1, true) ~= nil
-      end
-
-      local function quote_argument(value)
-        if is_powershell_host() then
-          return "'" .. value:gsub("'", "''") .. "'"
-        end
-
-        return '"' .. value:gsub('"', '""') .. '"'
-      end
-
-      local function command_for(executable, arguments)
-        local quoted = quote_argument(executable)
-        if is_powershell_host() then
-          return "& " .. quoted .. " " .. arguments
-        end
-
-        return quoted .. " " .. arguments
-      end
-
-      local function resolve_shell()
+      local function configure_shell()
         if vim.fn.has("win32") ~= 1 then
-          return vim.o.shell
+          return
         end
 
         local bash = git_bash()
-        if bash then
-          local bashrc = "/d/config/bash/.bashrc"
-          local arguments = "--rcfile " .. quote_argument(bashrc) .. " -i"
-          return command_for(bash, arguments)
+        if not bash then
+          return
         end
 
-        return vim.o.shell
+        -- ToggleTerm passes its terminal command through Neovim's configured shell.
+        -- Git Bash needs its executable in 'shell' and Bash-compatible flags in
+        -- 'shellcmdflag'; putting arguments inside 'shell' breaks that invocation.
+        vim.o.shell = '"' .. bash .. '"'
+        vim.o.shellcmdflag = "--rcfile /d/config/bash/.bashrc -i -s"
       end
+
+      configure_shell()
 
       require("toggleterm").setup({
         size = 15,
