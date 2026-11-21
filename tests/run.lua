@@ -52,11 +52,29 @@ test("core and UI setup", function()
   )
 end)
 
-test("keymaps are registered", function()
-  assert(vim.fn.maparg(",,", "n") ~= "")
+test("keymaps are registered and grouped", function()
+  for _, mapping in ipairs({
+    ",,",
+    "<C-h>",
+    " w",
+    " wa",
+    " wq",
+    " q",
+    " qa",
+    " qf",
+    " qA",
+    " nm",
+    " nc",
+    " nC",
+    " nr",
+    " nv",
+    " nS",
+  }) do
+    assert(vim.fn.maparg(mapping, "n") ~= "", "missing normal mapping: " .. mapping)
+  end
+
   assert(vim.fn.maparg(",,", "i") ~= "")
-  assert(vim.fn.maparg("<C-h>", "n") ~= "")
-  assert(vim.fn.maparg(" w", "n") ~= "")
+  assert(vim.fn.maparg(",,", "x") ~= "")
 end)
 
 test("platform and path helpers load", function()
