@@ -98,14 +98,49 @@ function M.setup()
     vim.wo.signcolumn = vim.wo.signcolumn == "no" and "yes" or "no"
   end, described("Toggle sign column"))
 
-  -- Working directory.
-  map("n", "<leader>cd", function()
+  -- Working directory: <leader>c...
+  local function current_file_dir()
     local file = vim.api.nvim_buf_get_name(0)
     if file == "" then
+      vim.notify("Current buffer has no file", vim.log.levels.WARN)
+      return nil
+    end
+
+    return vim.fn.fnamemodify(file, ":p:h")
+  end
+
+  map("n", "<leader>cd", function()
+    local dir = current_file_dir()
+    if dir then
+      vim.cmd.cd(vim.fn.fnameescape(dir))
+    end
+  end, described("Change cwd to file directory"))
+
+  map("n", "<leader>cr", function()
+    local root = vim.fs.root(0, { ".git" })
+    if not root then
+      vim.notify("No Git project root found", vim.log.levels.WARN)
       return
     end
-    vim.cmd.cd(vim.fn.fnameescape(vim.fn.fnamemodify(file, ":h")))
-  end, described("Change to file directory"))
+
+    vim.cmd.cd(vim.fn.fnameescape(root))
+  end, described("Change cwd to Git root"))
+
+  map("n", "<leader>cl", function()
+    local dir = current_file_dir()
+    if dir then
+      vim.cmd.lcd(vim.fn.fnameescape(dir))
+    end
+  end, described("Set window cwd to file directory"))
+
+  map("n", "<leader>ct", function()
+    local dir = current_file_dir()
+    if dir then
+      vim.cmd.tcd(vim.fn.fnameescape(dir))
+    end
+  end, described("Set tab cwd to file directory"))
+
+  map("n", "<leader>cp", "<cmd>pwd<CR>", described("Show current working directory"))
 
   map({ "i", "x" }, ",,", "<Esc>", opts)
   map("n", ",,", "<cmd>nohlsearch<CR>", opts)
