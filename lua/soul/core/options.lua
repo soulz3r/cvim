@@ -54,8 +54,7 @@ function M.setup()
     }, " ")
 
     if shell_name == "pwsh" or shell_name == "pwsh.exe" then
-      shell_flags = shell_flags
-        .. " $PSStyle.OutputRendering = 'PlainText'; $__SuppressAnsiEscapeSequences = 1;"
+      shell_flags = shell_flags .. " $PSStyle.OutputRendering = 'PlainText'; $__SuppressAnsiEscapeSequences = 1;"
     end
 
     vim.opt.shellcmdflag = shell_flags
