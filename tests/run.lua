@@ -336,6 +336,26 @@ test("Tiny-cmdline failure rolls UI2 back to native mode", function()
   package.preload["tiny-cmdline"] = nil
 end)
 
+test("message UI setup is idempotent", function()
+  local messages = require("soul.ui.messages")
+  local original_ui2 = package.loaded["soul.ui.ui2"]
+  local setup_calls = 0
+
+  package.loaded["soul.ui.ui2"] = {
+    setup = function()
+      setup_calls = setup_calls + 1
+      return true
+    end,
+  }
+
+  assert(messages.setup())
+  assert(messages.setup())
+  assert(setup_calls == 1)
+  assert(vim.api.nvim_get_commands({}).Messages ~= nil)
+
+  package.loaded["soul.ui.ui2"] = original_ui2
+end)
+
 test("health float interception applies shared geometry and restores API", function()
   local messages = require("soul.ui.messages")
   local util = vim.lsp.util
