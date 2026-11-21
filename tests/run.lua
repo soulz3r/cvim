@@ -38,7 +38,18 @@ test("core and UI setup", function()
   assert(vim.o.pumblend == 0)
   assert(vim.g.health.style == "float")
   assert(#vim.api.nvim_get_autocmds({ group = "CVIMCore" }) > 0)
-  assert(#vim.api.nvim_get_autocmds({ group = "CVIMDiagnostics" }) > 0)
+
+  local diagnostic_autocmds = vim.api.nvim_get_autocmds({ group = "CVIMDiagnostics" })
+  assert(#diagnostic_autocmds > 0)
+  assert(
+    vim.tbl_contains(
+      vim.tbl_map(function(autocmd)
+        return autocmd.event
+      end, diagnostic_autocmds),
+      "VimResized"
+    ),
+    "diagnostic float limits should refresh after a resize"
+  )
 end)
 
 test("keymaps are registered", function()
