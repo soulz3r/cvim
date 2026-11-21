@@ -56,10 +56,10 @@ test("keymaps are registered and grouped", function()
   for _, mapping in ipairs({
     ",,",
     "<C-h>",
-    " w",
+    " ww",
     " wa",
     " wq",
-    " q",
+    " qq",
     " qa",
     " qf",
     " qA",
