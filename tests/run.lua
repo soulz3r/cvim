@@ -56,6 +56,12 @@ test("platform and path helpers load", function()
   assert(type(platform.is_wsl) == "boolean")
   assert(type(platform.name) == "string")
   assert(type(paths.projects) == "string" and paths.projects ~= "")
+
+  if platform.is_windows then
+    assert(vim.o.shellcmdflag:find("UTF8Encoding", 1, true))
+    assert(vim.o.shellpipe == "> %s 2>&1")
+    assert(vim.o.shellredir == "> %s 2>&1")
+  end
 end)
 
 test("plugin specifications and lockfile agree", function()
