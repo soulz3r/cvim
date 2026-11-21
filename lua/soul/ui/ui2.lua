@@ -119,45 +119,8 @@ function M.install_notifications()
     return false, "Neovim UI2 msg_show handler is unavailable"
   end
 
-  local levels = {
-    emsg = vim.log.levels.ERROR,
-    lua_error = vim.log.levels.ERROR,
-    echoerr = vim.log.levels.ERROR,
-    rpc_error = vim.log.levels.ERROR,
-    shell_err = vim.log.levels.WARN,
-    wmsg = vim.log.levels.WARN,
-  }
-
-  M.ui2.msg.msg_show = function(kind, content)
-    local level = levels[kind] or vim.log.levels.INFO
-    if level ~= vim.log.levels.ERROR and level ~= vim.log.levels.WARN then
-      return
-    end
-
-    local message
-    if type(content) == "table" then
-      message = table.concat(vim.tbl_map(function(chunk)
-        return type(chunk) == "table" and tostring(chunk[2] or "") or tostring(chunk)
-      end, content))
-    else
-      message = tostring(content or "")
-    end
-
-    message = vim.trim(message)
-    if message == "" then
-      return
-    end
-
-    if message:find("W10", 1, true) or message:find("Changing a readonly file", 1, true) then
-      message = "This buffer is read-only. Changes are disabled."
-      level = vim.log.levels.WARN
-    end
-
-    vim.schedule(function()
-      vim.notify(message, level, {
-        title = level == vim.log.levels.ERROR and "NEOVIM ERROR" or "WARNING",
-      })
-    end)
+  M.ui2.msg.msg_show = function(kind, ...)
+    return original_msg_show(kind, ...)
   end
 
   M.original_ui2_msg_show = original_msg_show
