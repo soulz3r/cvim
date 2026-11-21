@@ -43,7 +43,7 @@ The configuration uses Lazy.nvim, native Neovim LSP, Blink.cmp, Telescope, Mini 
 - Mini Files with preview and hidden-file controls
 - Treesitter highlighting and folding
 - Mini.ai text objects and Mini.surround editing
-- ToggleTerm with persistent horizontal, vertical, and floating terminals
+- ToggleTerm with persistent horizontal, vertical, and floating terminals; Git Bash is preferred on Windows, with the configured shell used as fallback
 - Alpha dashboard with an animated C/VIM identity, randomized wordmark glitches, quick actions, project context, and an optional animated C tutorial
 - LSP-aware breadcrumbs in the winbar
 - Context-aware Lualine statusline
@@ -85,7 +85,7 @@ Install the tools you intend to use and make sure they are available on `PATH`:
 
 The language servers and debugger are installed outside Neovim. **Mason is intentionally not used.**
 
-C project build scripts are launched with `cmd.exe` on Windows and `bash` (falling back to `sh`) on Unix-like systems.
+C project build scripts are launched with `cmd.exe` on Windows and `bash` (falling back to `sh`) on Unix-like systems. ToggleTerm's Windows shell selection is separate: it prefers Git Bash when available and reuses the configured Neovim shell if Git Bash cannot be found.
 
 ## Installation
 
