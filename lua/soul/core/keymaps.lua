@@ -25,7 +25,7 @@ function M.setup()
   map({ "n", "x" }, "k", "gk", opts)
   map({ "n", "o", "x" }, "<S-h>", "^", opts)
   map({ "n", "o", "x" }, "<S-l>", "g_", opts)
-  map("x", "p", [["_dP]], opts)
+  map("x", "p", [[" _dP ]], opts)
   map("n", "J", "mzJ`z", opts)
   map("n", "<C-d>", "<C-d>zz", opts)
   map("n", "<C-u>", "<C-u>zz", opts)
@@ -34,16 +34,9 @@ function M.setup()
   map("x", "<M-j>", ":m '>+1<CR>gv=gv", opts)
   map("x", "<M-k>", ":m '<-2<CR>gv=gv", opts)
 
-  -- Write: <leader>w...
-  map("n", "<leader>ww", "<cmd>write<CR>", described("Write file"))
-  map("n", "<leader>wa", "<cmd>wall<CR>", described("Write all files"))
-  map("n", "<leader>wq", "<cmd>wq<CR>", described("Write and quit"))
-
-  -- Quit: <leader>q...
-  map("n", "<leader>qq", "<cmd>quit<CR>", described("Quit window"))
-  map("n", "<leader>qa", "<cmd>quitall<CR>", described("Quit all"))
-  map("n", "<leader>qf", "<cmd>quit!<CR>", described("Force quit window"))
-  map("n", "<leader>qA", "<cmd>quitall!<CR>", described("Force quit all"))
+  -- Write and quit.
+  map("n", "<leader>w", "<cmd>write<CR>", described("Write file"))
+  map("n", "<leader>q", "<cmd>confirm qall<CR>", described("Quit Neovim"))
 
   -- Neovim: <leader>n...
   map("n", "<leader>nm", "<cmd>Messages<CR>", described("Message history"))
