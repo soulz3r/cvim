@@ -119,21 +119,6 @@ function M.setup()
     vim.cmd.cd(vim.fn.fnameescape(root))
   end, described("Change cwd to Git root"))
 
-  map("n", "<leader>cl", function()
-    local dir = current_file_dir()
-    if dir then
-      vim.cmd.lcd(vim.fn.fnameescape(dir))
-    end
-  end, described("Set window cwd to file directory"))
-
-  map("n", "<leader>ct", function()
-    local dir = current_file_dir()
-    if dir then
-      vim.cmd.tcd(vim.fn.fnameescape(dir))
-    end
-  end, described("Set tab cwd to file directory"))
-
-  map("n", "<leader>cp", "<cmd>pwd<CR>", described("Show current working directory"))
 
   map({ "i", "x" }, ",,", "<Esc>", opts)
   map("n", ",,", "<cmd>nohlsearch<CR>", opts)
