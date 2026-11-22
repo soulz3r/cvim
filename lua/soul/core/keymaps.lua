@@ -60,9 +60,15 @@ function M.setup()
   map("n", "<leader>bD", "<cmd>bdelete!<CR>", described("Force delete buffer"))
   map("n", "<leader>br", "<cmd>edit<CR>", described("Re-read current file"))
 
+  -- Tabs: <leader>t...
+  map("n", "<leader>tt", "<cmd>tabs<CR>", described("List tabs"))
+  map("n", "<leader>tn", "<cmd>tabnext<CR>", described("Next tab"))
+  map("n", "<leader>tp", "<cmd>tabprevious<CR>", described("Previous tab"))
+  map("n", "<leader>td", "<cmd>tabclose<CR>", described("Close tab"))
+
   -- Windows: <leader>s...
-  map("n", "<leader>sv", "<cmd>vsplit<CR>", described("Split window vertically"))
-  map("n", "<leader>sh", "<cmd>split<CR>", described("Split window horizontally"))
+  map("n", "<leader>sv", "<cmd>tab split<CR><cmd>vsplit<CR>", described("Open vertical splits in a new tab"))
+  map("n", "<leader>sh", "<cmd>tab split<CR><cmd>split<CR>", described("Open horizontal splits in a new tab"))
   map("n", "<leader>se", "<C-w>=", described("Equalize window sizes"))
   map("n", "<leader>so", "<cmd>only<CR>", described("Close other windows"))
   map("n", "<leader>sr", "<C-w>r", described("Rotate windows"))
