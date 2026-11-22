@@ -87,29 +87,28 @@ The leader key is Space. Mappings are grouped by purpose:
 | `<leader>nr` | Reload config `init.lua` |
 | `<leader>nv` | Neovim version |
 | `<leader>nS` | Loaded scripts |
-| **Write: `<leader>w`** | |
-| `<leader>ww` | Write current file |
-| `<leader>wa` | Write all files |
-| `<leader>wq` | Write and quit current window |
-| **Quit: `<leader>q`** | |
-| `<leader>qq` | Quit current window |
-| `<leader>qa` | Quit all |
-| `<leader>qf` | Force quit current window |
-| `<leader>qA` | Force quit all |
+| **Write and quit** | |
+| `<leader>w` | Write current file |
+| `<leader>q` | Confirm and quit all (prompts for modified buffers) |
 | **Buffers: `<leader>b`** | |
 | `<leader>bb` | List buffers |
 | `<leader>bn` | Next buffer |
 | `<leader>bp` | Previous buffer |
 | `<leader>bd` | Delete buffer |
 | `<leader>bD` | Force delete buffer |
-| `<leader>br` | Re-read current file (won’t discard unsaved changes) |
-| **Windows: `<leader>s`** | |
-| `<leader>sv` | Vertical split |
-| `<leader>sh` | Horizontal split |
+| `<leader>br` | Re-read current file |
+| **Splits: `<leader>s`** | |
+| `<leader>sv` | Open a new tab with a vertical split |
+| `<leader>sh` | Open a new tab with a horizontal split |
 | `<leader>se` | Equalize split sizes |
 | `<leader>sx` | Close split |
 | `<leader>so` | Close other windows |
 | `<leader>sr` | Rotate windows |
+| **Tabs: `<leader>t`** | |
+| `<leader>tt` | List tabs |
+| `<leader>tn` | Next tab |
+| `<leader>tp` | Previous tab |
+| `<leader>td` | Close tab |
 | **UI toggles: `<leader>u`** | |
 | `<leader>uw` | Toggle line wrap |
 | `<leader>un` | Toggle line numbers |
@@ -123,9 +122,6 @@ The leader key is Space. Mappings are grouped by purpose:
 | **Working directory: `<leader>c`** | |
 | `<leader>cd` | Change global cwd to current file directory |
 | `<leader>cr` | Change global cwd to Git project root |
-| `<leader>cl` | Set window-local cwd to current file directory |
-| `<leader>ct` | Set tab-local cwd to current file directory |
-| `<leader>cp` | Show current working directory |
 | `<leader>L` | Open Lazy.nvim |
 | Ctrl+\\ | Toggle the floating terminal |
 | `,,` | Exit insert/visual mode; clear search in normal mode |
