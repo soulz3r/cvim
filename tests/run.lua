@@ -21,6 +21,33 @@ test("all Lua files parse", function()
   end
 end)
 
+test("plugin lifecycle starts once and cleans up in reverse order", function()
+  local lifecycle = require("soul.core.lifecycle")
+  local calls = {}
+
+  assert(lifecycle.start("first", function()
+    table.insert(calls, "start-first")
+    return function()
+      table.insert(calls, "stop-first")
+    end
+  end))
+  assert(lifecycle.start("first", function()
+    error("setup must not run twice")
+  end))
+  assert(lifecycle.start("second", function()
+    table.insert(calls, "start-second")
+    return function()
+      table.insert(calls, "stop-second")
+    end
+  end))
+
+  assert(lifecycle.is_active("first"))
+  assert(lifecycle.stop_all())
+  assert(table.concat(calls, ",") == "start-first,start-second,stop-second,stop-first")
+  assert(not lifecycle.is_active("first"))
+  assert(not lifecycle.is_active("second"))
+end)
+
 test("core and UI setup", function()
   vim.g.mapleader = " "
   vim.g.maplocalleader = " "
@@ -28,6 +55,7 @@ test("core and UI setup", function()
   require("soul.core.options").setup()
   require("soul.core.autocmds").setup()
   require("soul.core.keymaps").setup()
+  require("soul.ui.float").setup()
   require("soul.ui.options").setup()
   require("soul.ui.diagnostics").setup()
 
@@ -344,10 +372,6 @@ test("UI2 uses native ephemeral messages and restores cleanly", function()
   assert(enabled_options.msg.msg.timeout == 3500)
   assert(enabled_options.msg.msg.height == 0.35)
   assert(enabled_options.msg.pager.height == 0.85)
-  assert(
-    #vim.api.nvim_get_autocmds({ group = "CVIMUI2Borders" }) == 0,
-    "CVIM must not override UI2-owned float borders"
-  )
 
   assert(manager.restore())
   assert(manager.is_enabled() == false)
@@ -359,7 +383,7 @@ test("UI2 uses native ephemeral messages and restores cleanly", function()
   package.loaded["soul.ui.ui2"] = nil
 end)
 
-test("Tiny-cmdline failure rolls UI2 back to native mode", function()
+test("Tiny-cmdline failure keeps UI2 message handling active", function()
   local manager = require("soul.ui.ui2")
   package.loaded["soul.plugins.tiny_cmdline"] = nil
   local tiny = require("soul.plugins.tiny_cmdline")
@@ -381,12 +405,15 @@ test("Tiny-cmdline failure rolls UI2 back to native mode", function()
   assert(manager.setup())
   tiny.config()
 
-  assert(manager.is_enabled() == false)
+  assert(manager.is_enabled() == true, "Tiny-cmdline failure must not disable UI2")
   assert(vim.o.cmdheight == 0)
   assert(#notifications == 1)
   assert(notifications[1]:find("native command line", 1, true))
+  assert(require("soul.core.lifecycle").is_active("ui2"))
+
   vim.notify = original_notify
   package.preload["tiny-cmdline"] = nil
+  manager.restore()
 end)
 
 test("message UI setup is idempotent", function()
@@ -444,54 +471,36 @@ test("health float interception applies shared geometry and restores API", funct
   vim.notify = original_notify
 end)
 
-test(":messages opens the shared bordered output float", function()
+test(":messages opens history in the shared float without restarting UI2", function()
   local messages = require("soul.ui.messages")
-  local original_execute = vim.fn.execute
+  local original_exec2 = vim.api.nvim_exec2
   local original_schedule = vim.schedule
   local original_open_output = messages.open_output
-  local original_ui2 = package.loaded["soul.ui.ui2"]
-  local executed, opened, lifecycle = {}, {}, {}
-  local ui2 = {
-    is_enabled = function()
-      return true
-    end,
-    restore = function()
-      table.insert(lifecycle, "restore")
-      return true
-    end,
-    setup = function()
-      table.insert(lifecycle, "setup")
-      return true
-    end,
-  }
+  local executed, opened = {}, {}
 
-  package.loaded["soul.ui.ui2"] = ui2
-  vim.fn.execute = function(command)
-    table.insert(executed, command)
-    table.insert(lifecycle, "execute")
-    return "first message\nsecond message"
+  vim.api.nvim_exec2 = function(command, options)
+    table.insert(executed, { command = command, options = options })
+    return { output = "first message\nsecond message" }
   end
   vim.schedule = function(callback)
     callback()
   end
   messages.open_output = function(title, output, filetype)
     table.insert(opened, { title = title, output = output, filetype = filetype })
-    table.insert(lifecycle, "open")
   end
 
   assert(messages._handle_command("messages"))
-  assert(#executed == 1 and executed[1] == "messages")
+  assert(#executed == 1 and executed[1].command == "messages")
+  assert(executed[1].options.output == true)
   assert(#opened == 1)
   assert(opened[1].title == "Messages")
   assert(opened[1].output == "first message\nsecond message")
   assert(opened[1].filetype == "text")
-  assert(table.concat(lifecycle, ",") == "restore,execute,setup,open")
   assert(not messages._handle_command("messages clear"), ":messages clear must remain native")
 
-  vim.fn.execute = original_execute
+  vim.api.nvim_exec2 = original_exec2
   vim.schedule = original_schedule
   messages.open_output = original_open_output
-  package.loaded["soul.ui.ui2"] = original_ui2
 end)
 
 test("inspection commands do not intercept highlight mutations", function()
@@ -570,6 +579,7 @@ test("output windows use the shared float layout", function()
   assert(config.relative == "editor")
   assert(config.width == expected.width and config.height == expected.height)
   assert(config.row == expected.row and config.col == expected.col)
+  assert(config.border == "rounded")
   assert(vim.wo[win].wrap == false)
   assert(vim.api.nvim_buf_get_lines(0, 0, -1, false)[1] == "first line")
 

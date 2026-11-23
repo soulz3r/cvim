@@ -1,17 +1,14 @@
-local M = {
-  enabled = false,
-}
+local M = { enabled = false }
+local lifecycle = require("soul.core.lifecycle")
 
 local function get_ui2()
   if vim.fn.has("nvim-0.12") ~= 1 then
     return nil, "Neovim 0.12 or newer is required"
   end
-
   local ok, ui2 = pcall(require, "vim._core.ui2")
   if not ok or type(ui2) ~= "table" or type(ui2.enable) ~= "function" then
     return nil, "Neovim UI2 is unavailable"
   end
-
   return ui2
 end
 
@@ -24,57 +21,37 @@ function M.is_enabled()
 end
 
 function M.setup()
-  if M.enabled then
-    return true
-  end
+  return lifecycle.start("ui2", function()
+    local ui2, err = get_ui2()
+    if not ui2 then
+      error(err)
+    end
 
-  local ui2, err = get_ui2()
-  if not ui2 then
-    return false, err
-  end
-
-  -- UI2 owns the geometry and borders of its special message windows.
-  -- Do not rewrite those configs from FileType/WinEnter autocmds: UI2
-  -- recalculates them while laying out messages and would overwrite us.
-  local ok, enable_error = pcall(ui2.enable, {
-    enable = true,
-    msg = {
-      targets = "msg",
+    -- UI2 owns the geometry and borders of its special message windows.
+    ui2.enable({
+      enable = true,
       msg = {
-        height = 0.35,
-        timeout = 3500,
+        targets = "msg",
+        msg = { height = 0.35, timeout = 3500 },
+        pager = { height = 0.85 },
       },
-      pager = {
-        height = 0.85,
-      },
-    },
-  })
+    })
 
-  if not ok then
-    return false, tostring(enable_error)
-  end
-
-  M.ui2 = ui2
-  M.enabled = true
-  return true
+    M.ui2 = ui2
+    M.enabled = true
+    return function()
+      local ok, disable_error = pcall(ui2.enable, { enable = false })
+      M.enabled = false
+      M.ui2 = nil
+      if not ok then
+        error("Could not disable Neovim UI2: " .. tostring(disable_error))
+      end
+    end
+  end)
 end
 
 function M.restore()
-  if not M.enabled then
-    return true
-  end
-
-  local ok, err = pcall(M.ui2.enable, {
-    enable = false,
-  })
-
-  if not ok then
-    return false, "Could not disable Neovim UI2: " .. tostring(err)
-  end
-
-  M.enabled = false
-  M.ui2 = nil
-  return true
+  return lifecycle.stop("ui2")
 end
 
 return M

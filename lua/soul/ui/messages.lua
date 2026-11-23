@@ -38,6 +38,10 @@ function M.open_output(title, output, filetype)
     lines = { "No output." }
   end
 
+  if M.output_win and vim.api.nvim_win_is_valid(M.output_win) then
+    float.close(M.output_win)
+  end
+
   local buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
   vim.bo[buf].buftype = "nofile"
@@ -46,11 +50,23 @@ function M.open_output(title, output, filetype)
   vim.bo[buf].swapfile = false
   vim.bo[buf].filetype = filetype or "vim"
 
-  local win = vim.api.nvim_open_win(buf, true, vim.tbl_extend("force", float.config(title), { style = "minimal" }))
+  local win = float.open(buf, title, { style = "minimal" })
+  M.output_win = win
   vim.wo[win].wrap = false
   vim.wo[win].cursorline = false
-  vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = buf, silent = true })
-  vim.keymap.set("n", "<Esc>", "<cmd>close<cr>", { buffer = buf, silent = true })
+  vim.wo[win].number = false
+  vim.wo[win].relativenumber = false
+  vim.wo[win].signcolumn = "no"
+
+  local function close_output()
+    if M.output_win == win then
+      M.output_win = nil
+    end
+    float.close(win)
+  end
+  vim.keymap.set("n", "q", close_output, { buffer = buf, silent = true, desc = "Close output window" })
+  vim.keymap.set("n", "<Esc>", close_output, { buffer = buf, silent = true, desc = "Close output window" })
+  return win
 end
 
 local output_commands = {
@@ -238,34 +254,14 @@ local function handle_command(command_line)
 end
 
 function M.show_history()
-  local ui2 = require("soul.ui.ui2")
-  local restore_ui2 = ui2.is_enabled()
-
-  -- UI2 handles :messages by opening its own pager. Temporarily restore the
-  -- native message renderer so execute() can capture the history as text.
-  if restore_ui2 then
-    local restored, err = ui2.restore()
-    if not restored then
-      vim.notify("Could not prepare message history: " .. tostring(err), vim.log.levels.ERROR)
-      return false
-    end
-  end
-
-  local ok, output = pcall(vim.fn.execute, "messages")
-
-  if restore_ui2 then
-    local enabled, err = ui2.setup()
-    if not enabled then
-      vim.notify("Could not restore Neovim UI2: " .. tostring(err), vim.log.levels.ERROR)
-    end
-  end
-
+  -- Capture history directly. UI2 stays enabled, so normal messages keep
+  -- using its short-lived message target while history opens in a CVIM float.
+  local ok, result = pcall(vim.api.nvim_exec2, "messages", { output = true })
   if not ok then
-    vim.notify(tostring(output), vim.log.levels.ERROR)
+    vim.notify(tostring(result), vim.log.levels.ERROR)
     return false
   end
-
-  M.open_output("Messages", output, "text")
+  M.open_output("Messages", result.output, "text")
   return true
 end
 

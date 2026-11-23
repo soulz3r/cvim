@@ -14,6 +14,7 @@ function M.setup()
   vim.g.mapleader = " "
   vim.g.maplocalleader = " "
 
+  require("soul.core.lifecycle").setup()
   require("soul.core.options").setup()
   require("soul.core.autocmds").setup()
   require("soul.ui").setup()

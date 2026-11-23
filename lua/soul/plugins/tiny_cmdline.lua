@@ -1,4 +1,5 @@
 local ui2 = require("soul.ui.ui2")
+local lifecycle = require("soul.core.lifecycle")
 
 local M = {
   "rachartier/tiny-cmdline.nvim",
@@ -7,66 +8,38 @@ local M = {
 }
 
 function M.config()
-  if not ui2.is_enabled() then
+  local ok, err = lifecycle.start("tiny-cmdline", function()
     vim.o.cmdheight = 0
-    return
-  end
-
-  local ok, err = pcall(function()
-    vim.o.cmdheight = 0
+    if not ui2.is_enabled() then
+      return
+    end
 
     local tiny_cmdline = require("tiny-cmdline")
-
     tiny_cmdline.setup({
-      width = {
-        value = "60%",
-        min = 40,
-        max = 100,
-      },
-
-      position = {
-        x = "50%",
-        y = "50%",
-      },
-
+      width = { value = "60%", min = 40, max = 100 },
+      position = { x = "50%", y = "50%" },
       border = "rounded",
-
-      title = {
-        enabled = true,
-        pos = "center",
-      },
-
+      title = { enabled = true, pos = "center" },
       menu_col_offset = 3,
-
       native_types = {},
-
       on_reposition = tiny_cmdline.adapters.blink,
     })
 
-    vim.api.nvim_set_hl(0, "TinyCmdlineNormal", {
-      link = "NormalFloat",
-    })
+    vim.api.nvim_set_hl(0, "TinyCmdlineNormal", { link = "NormalFloat" })
+    vim.api.nvim_set_hl(0, "TinyCmdlineBorder", { link = "FloatBorder" })
+    vim.api.nvim_set_hl(0, "TinyCmdlineTitle", { link = "FloatTitle" })
 
-    vim.api.nvim_set_hl(0, "TinyCmdlineBorder", {
-      link = "FloatBorder",
-    })
-
-    vim.api.nvim_set_hl(0, "TinyCmdlineTitle", {
-      link = "FloatTitle",
-    })
+    return function()
+      if type(tiny_cmdline.teardown) == "function" then
+        tiny_cmdline.teardown()
+      end
+    end
   end)
 
   if not ok then
-    local restored, restore_error = ui2.restore()
+    -- Tiny-cmdline is optional. Its failure must not disable UI2 messages.
     vim.o.cmdheight = 0
-
-    local message = "tiny-cmdline/UI2 setup failed; using Neovim's native command line.\n" .. tostring(err)
-
-    if not restored then
-      message = message .. "\nUI2 cleanup also failed: " .. tostring(restore_error)
-    end
-
-    vim.notify(message, vim.log.levels.WARN)
+    vim.notify("tiny-cmdline setup failed; using Neovim's native command line.\n" .. tostring(err), vim.log.levels.WARN)
   end
 end
 

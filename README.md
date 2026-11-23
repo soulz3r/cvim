@@ -18,14 +18,14 @@ CVIM keeps core editing behavior, UI settings, diagnostics, messages, keymaps, t
 
 Tiny-cmdline is optional at startup. UI2 is initialized once through `soul.ui.ui2` on supported platforms, including Windows. If UI2 is unavailable or Tiny-cmdline setup fails, CVIM falls back to Neovim's native command-line handling.
 
-UI2 presents ordinary messages in its ephemeral message area with a 3.5-second timeout. CVIM leaves Neovim's built-in `:messages` command untouched, so message history opens in UI2's native pager. Use `<leader>nm` or `:messages` to inspect history. CVIM does not monkey-patch Neovim's private UI2 message handlers.
+UI2 presents ordinary bottom messages in its ephemeral message area for 3.5 seconds, so status messages do not remain stuck until another message replaces them. `:messages` and `<leader>nm` capture history into the shared CVIM float without disabling or restarting UI2. Tiny-cmdline is an independent optional command-line integration: if it fails, UI2 message notifications remain active.
 
 ## UI
 
 CVIM uses a transparent UI with visible, rounded borders:
 
 - Floating windows, diagnostics, popup menus, and Lazy.nvim use rounded borders.
-- CVIM-owned output and diagnostic floats share responsive width and height limits, recalculated when the editor is resized.
+- CVIM-owned output floats share one responsive layout, replace older output windows, close cleanly, and recalculate their geometry when the editor is resized.
 - Border foregrounds come from the active colorscheme and remain visible.
 - Border, float, title, footer, and popup backgrounds are forced to NONE, preventing a colored strip or halo around the outline.
 - Popup blending is disabled; selection colors and syntax highlighting remain intact.
@@ -46,7 +46,7 @@ Neovim does not provide one global margin or padding option for every window. Th
 - `tests`: headless regression checks and isolated startup smoke test
 - `.github/workflows`: automated formatting, syntax, and smoke checks
 
-Side-effect modules expose `M.setup()`. Plugin specification modules return their specification tables. The root `init.lua` only loads `soul`; startup orchestration lives in `lua/soul/init.lua`.
+Side-effect modules expose `M.setup()`. Plugin specification modules return their specification tables. Lazy.nvim owns plugin loading; `soul.core.lifecycle` owns setup and cleanup for CVIM-managed integrations, runs setup once, and tears resources down in reverse order at exit. The root `init.lua` only loads `soul`; startup orchestration lives in `lua/soul/init.lua`.
 
 No separate documentation directory is needed for this configuration. The README is the entry point.
 
