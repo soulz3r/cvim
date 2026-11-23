@@ -133,6 +133,85 @@ test("plugin specifications and lockfile agree", function()
   assert(lockfile["tiny-cmdline.nvim"] and lockfile["toggleterm.nvim"] and not lockfile["blink.cmp"])
 end)
 
+test("Treesitter requests parsers and attaches shell buffers", function()
+  local original_preload = package.preload["nvim-treesitter"]
+  local original_loaded = package.loaded["nvim-treesitter"]
+  local original_start = vim.treesitter.start
+  local original_get_lang = vim.treesitter.language.get_lang
+  local original_schedule = vim.schedule
+  local requested
+  local started
+  local install_callback
+
+  package.loaded["nvim-treesitter"] = nil
+  package.preload["nvim-treesitter"] = function()
+    return {
+      install = function(languages, options)
+        requested = {
+          languages = languages,
+          options = options,
+        }
+
+        return {
+          await = function(_, callback)
+            install_callback = callback
+          end,
+        }
+      end,
+    }
+  end
+
+  vim.treesitter.language.get_lang = function(filetype)
+    return filetype == "c" and "c" or filetype
+  end
+  vim.treesitter.start = function(buf, lang)
+    started = { buf = buf, lang = lang }
+  end
+  vim.schedule = function(callback)
+    callback()
+  end
+
+  package.loaded["soul.plugins.treesitter"] = nil
+  local spec = require("soul.plugins.treesitter")
+  assert(spec.lazy == false)
+  assert(spec.build == ":TSUpdate")
+  spec.config()
+
+  assert(requested and requested.options.max_jobs == 2)
+  assert(vim.tbl_contains(requested.languages, "c"))
+  assert(vim.tbl_contains(requested.languages, "bash"))
+  assert(vim.tbl_contains(requested.languages, "markdown_inline"))
+  assert(type(install_callback) == "function")
+
+  local autocmds = vim.api.nvim_get_autocmds({
+    group = "CVIMTreesitter",
+    event = "FileType",
+  })
+  assert(#autocmds == 1)
+
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.bo[buf].filetype = "sh"
+
+  autocmds[1].callback({
+    buf = buf,
+    match = "sh",
+  })
+  assert(started and started.buf == buf and started.lang == "bash")
+
+  started = nil
+  install_callback(nil, true)
+  assert(started and started.buf == buf and started.lang == "bash",
+    "buffers opened before parser installation should attach after installation completes")
+
+  vim.treesitter.start = original_start
+  vim.treesitter.language.get_lang = original_get_lang
+  vim.schedule = original_schedule
+  package.preload["nvim-treesitter"] = original_preload
+  package.loaded["nvim-treesitter"] = original_loaded
+  package.loaded["soul.plugins.treesitter"] = nil
+  vim.api.nvim_buf_delete(buf, { force = true })
+end)
+
 test("PowerShell resolution falls back to Windows PowerShell", function()
   local original_executable = vim.fn.executable
   local original_exepath = vim.fn.exepath
@@ -207,15 +286,18 @@ test("ToggleTerm reuses PowerShell when Git Bash is unavailable", function()
   package.loaded.toggleterm = original_loaded
 end)
 
-test("UI2 remains available on Windows", function()
+test("UI2 uses native ephemeral messages and restores cleanly", function()
   local original_has = vim.fn.has
+  local enabled_options
+  local disable_calls = 0
   local ui2 = {
-    msg = { msg_show = function() end },
-    enable = function() end,
-  }
-  local message_store = {
-    msg_show = function() end,
-    msg_clear = function() end,
+    enable = function(options)
+      if options.enable == false then
+        disable_calls = disable_calls + 1
+      else
+        enabled_options = options
+      end
+    end,
   }
 
   vim.fn.has = function(feature)
@@ -224,139 +306,30 @@ test("UI2 remains available on Windows", function()
     end
     return original_has(feature)
   end
+
   package.loaded["vim._core.ui2"] = nil
-  package.loaded["vim._core.ui2.messages"] = nil
   package.preload["vim._core.ui2"] = function()
     return ui2
-  end
-  package.preload["vim._core.ui2.messages"] = function()
-    return message_store
   end
   package.loaded["soul.ui.ui2"] = nil
 
   local manager = require("soul.ui.ui2")
   assert(manager.available())
   assert(manager.setup())
+  assert(manager.setup())
   assert(manager.is_enabled())
-  assert(manager.restore())
+  assert(enabled_options.msg.targets == "msg")
+  assert(enabled_options.msg.msg.timeout == 3500)
+  assert(enabled_options.msg.msg.height == 0.35)
+  assert(enabled_options.msg.pager.height == 0.85)
 
-  vim.fn.has = original_has
-  package.preload["vim._core.ui2"] = nil
-  package.preload["vim._core.ui2.messages"] = nil
-  package.loaded["vim._core.ui2"] = nil
-  package.loaded["vim._core.ui2.messages"] = nil
-  package.loaded["soul.ui.ui2"] = nil
-end)
-
-test("UI2 initializes once and restores all handlers", function()
-  local enable_calls = 0
-  local disable_calls = 0
-  local forwarded
-  local original_ui2_show = function(kind, ...)
-    forwarded = { kind, ... }
-  end
-  local original_message_show = function() end
-  local message_store = {
-    msg_show = original_message_show,
-    msg_clear = function() end,
-  }
-  local ui2 = {
-    msg = { msg_show = original_ui2_show },
-    enable = function(options)
-      if options.enable == false then
-        disable_calls = disable_calls + 1
-      else
-        assert(options.enable == true)
-        assert(options.msg.targets == "cmd")
-        enable_calls = enable_calls + 1
-      end
-    end,
-  }
-
-  package.loaded["vim._core.ui2"] = nil
-  package.loaded["vim._core.ui2.messages"] = nil
-  package.preload["vim._core.ui2"] = function()
-    return ui2
-  end
-  package.preload["vim._core.ui2.messages"] = function()
-    return message_store
-  end
-
-  local manager = require("soul.ui.ui2")
-  assert(manager.setup())
-  assert(manager.setup())
-  assert(enable_calls == 1)
-  assert(message_store.msg_show ~= original_message_show)
-
-  assert(manager.install_notifications())
-  assert(ui2.msg.msg_show ~= original_ui2_show)
-  ui2.msg.msg_show("echo", "bottom message", true)
-  assert(forwarded and forwarded[1] == "echo")
-  assert(forwarded[2] == "bottom message" and forwarded[3] == true)
   assert(manager.restore())
   assert(manager.is_enabled() == false)
   assert(disable_calls == 1)
-  assert(ui2.msg.msg_show == original_ui2_show)
-  assert(message_store.msg_show == original_message_show)
-end)
 
-test("UI2 messages use severity-based timeouts", function()
-  local original_defer = vim.defer_fn
-  local callbacks, delays = {}, {}
-  local clear_calls = 0
-  local message_store = {
-    msg_show = function() end,
-    msg_clear = function()
-      clear_calls = clear_calls + 1
-    end,
-  }
-  local ui2 = {
-    msg = { msg_show = function() end },
-    enable = function() end,
-  }
-
-  vim.defer_fn = function(callback, delay)
-    table.insert(callbacks, callback)
-    table.insert(delays, delay)
-  end
-  package.loaded["vim._core.ui2"] = nil
-  package.loaded["vim._core.ui2.messages"] = nil
-  package.preload["vim._core.ui2"] = function()
-    return ui2
-  end
-  package.preload["vim._core.ui2.messages"] = function()
-    return message_store
-  end
-  package.loaded["soul.ui.ui2"] = nil
-
-  local manager = require("soul.ui.ui2")
-  assert(manager.setup())
-  message_store.msg_show("echo", "information")
-  message_store.msg_show("wmsg", "warning")
-  message_store.msg_show("emsg", "error")
-  message_store.msg_show("return_prompt", "press enter")
-
-  assert(delays[1] == 2000)
-  assert(delays[2] == 4000)
-  assert(delays[3] == 6000)
-  assert(#delays == 3, "interactive prompts must not be auto-cleared")
-
-  callbacks[1]()
-  callbacks[2]()
-  callbacks[3]()
-  assert(clear_calls == 0, "an older timer must not clear a newer interactive prompt")
-
-  message_store.msg_show("echo", "new information")
-  assert(delays[4] == 2000)
-  callbacks[4]()
-  assert(clear_calls == 1, "the newest timed message should clear after its timeout")
-
-  assert(manager.restore())
-  vim.defer_fn = original_defer
+  vim.fn.has = original_has
   package.preload["vim._core.ui2"] = nil
-  package.preload["vim._core.ui2.messages"] = nil
   package.loaded["vim._core.ui2"] = nil
-  package.loaded["vim._core.ui2.messages"] = nil
   package.loaded["soul.ui.ui2"] = nil
 end)
 
@@ -405,7 +378,7 @@ test("message UI setup is idempotent", function()
   assert(messages.setup())
   assert(messages.setup())
   assert(setup_calls == 1)
-  assert(vim.api.nvim_get_commands({}).Messages ~= nil)
+  assert(vim.api.nvim_get_commands({}).Messages == nil, "CVIM must leave the built-in :messages command untouched")
 
   package.loaded["soul.ui.ui2"] = original_ui2
 end)

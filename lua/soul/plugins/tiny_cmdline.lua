@@ -15,11 +15,6 @@ function M.config()
   local ok, err = pcall(function()
     vim.o.cmdheight = 0
 
-    local installed, install_error = ui2.install_notifications()
-    if not installed then
-      error(install_error)
-    end
-
     local tiny_cmdline = require("tiny-cmdline")
 
     tiny_cmdline.setup({
@@ -80,4 +75,3 @@ function M.config()
 end
 
 return M
-

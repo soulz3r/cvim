@@ -53,10 +53,6 @@ function M.open_output(title, output, filetype)
   vim.keymap.set("n", "<Esc>", "<cmd>close<cr>", { buffer = buf, silent = true })
 end
 
-local function open_messages()
-  M.open_output("Messages", vim.api.nvim_exec2("messages", { output = true }).output)
-end
-
 local output_commands = {
   map = { min = 0, max = 1 },
   nmap = { min = 0, max = 1 },
@@ -239,10 +235,6 @@ function M.setup()
     vim.notify("Neovim UI2 is unavailable; using native messages.\n" .. tostring(err), vim.log.levels.WARN)
   end
 
-  vim.api.nvim_create_user_command("Messages", open_messages, {
-    desc = "Show message history in a centered, titled window",
-  })
-
   vim.keymap.set("c", "<CR>", function()
     if vim.fn.getcmdtype() ~= ":" then
       return "<CR>"
@@ -252,9 +244,6 @@ function M.setup()
     local trimmed = vim.trim(command_line)
     if trimmed == "" then
       return "<CR>"
-    end
-    if trimmed:lower() == "messages" then
-      return "<C-u>Messages<CR>"
     end
     if handle_command(command_line) then
       return "<C-c>"

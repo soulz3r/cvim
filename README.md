@@ -13,11 +13,12 @@ CVIM keeps core editing behavior, UI settings, diagnostics, messages, keymaps, t
 - Eyeliner for subtle character-jump hints
 - Telescope for file finding, live grep, buffers, and help
 - ToggleTerm with a floating terminal on `Ctrl+\\`, using Git Bash on Windows and explicitly loading `D:/config/bash/.bashrc`, with `pwsh` and Windows PowerShell fallbacks
+- Treesitter with automatic asynchronous installation of C, Lua, Vim, Vimdoc, Bash, Markdown, and Markdown Inline parsers
 - Tiny-cmdline with Neovim's built-in command-line completion and Neovim 0.12 UI2 support across Windows and Linux
 
-Tiny-cmdline is optional at startup and UI2 is initialized once through `soul.ui.ui2` on supported platforms, including Windows. If UI2 is unavailable or Tiny-cmdline setup fails, CVIM falls back to native command-line handling and restores the original UI2 message handlers.
+Tiny-cmdline is optional at startup. UI2 is initialized once through `soul.ui.ui2` on supported platforms, including Windows. If UI2 is unavailable or Tiny-cmdline setup fails, CVIM falls back to Neovim's native command-line handling.
 
-Mini.notify is intentionally excluded. Error and warning messages use native notifications when Tiny-cmdline is active.
+UI2 presents ordinary messages in its ephemeral message area with a 3.5-second timeout. CVIM leaves Neovim's built-in `:messages` command untouched, so message history opens in UI2's native pager. Use `<leader>nm` or `:messages` to inspect history. CVIM does not monkey-patch Neovim's private UI2 message handlers.
 
 ## UI
 
@@ -29,7 +30,7 @@ CVIM uses a transparent UI with visible, rounded borders:
 - Border, float, title, footer, and popup backgrounds are forced to NONE, preventing a colored strip or halo around the outline.
 - Popup blending is disabled; selection colors and syntax highlighting remain intact.
 - Neovim's native `:checkhealth` uses its built-in floating style, with its preview dimensions configured before the float is created.
-- Messages, command listings, help pages, and other supported read-only output open in a centered floating window.
+- Command listings, help pages, and other supported read-only output open in a centered floating window; message history uses UI2's native pager.
 - Supported output includes mapping listings, registers, highlights, marks, jumps, changes, digraphs, script names, version, buffers, history, and autocmd listings.
 - Commands that modify mappings, options, files, or editor state keep their normal behavior.
 - Temporary help/man command windows are cleaned up across tabs before the captured output is displayed.
@@ -45,7 +46,7 @@ Neovim does not provide one global margin or padding option for every window. Th
 - `tests`: headless regression checks and isolated startup smoke test
 - `.github/workflows`: automated formatting, syntax, and smoke checks
 
-Side-effect modules expose `M.setup()`. Plugin specification modules return their specification tables. The entrypoint calls setup functions explicitly.
+Side-effect modules expose `M.setup()`. Plugin specification modules return their specification tables. The root `init.lua` only loads `soul`; startup orchestration lives in `lua/soul/init.lua`.
 
 No separate documentation directory is needed for this configuration. The README is the entry point.
 
@@ -150,4 +151,4 @@ GitHub Actions checks StyLua formatting across Lua modules and tests, runs the r
 
 Clone this repository into Neovim's config directory and start Neovim. Lazy.nvim bootstraps itself and installs the configured plugins.
 
-Requires Git and Neovim 0.12 or newer.
+Requires Git and Neovim 0.12 or newer. Treesitter parser installation additionally requires `tree-sitter-cli` 0.26.1 or newer, `tar`, `curl`, and a working C compiler on PATH. Parsers are requested automatically at startup and installed asynchronously when missing.
