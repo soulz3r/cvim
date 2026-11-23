@@ -462,10 +462,26 @@ test(":messages opens the shared bordered output float", function()
   local original_execute = vim.fn.execute
   local original_schedule = vim.schedule
   local original_open_output = messages.open_output
-  local executed, opened = {}, {}
+  local original_ui2 = package.loaded["soul.ui.ui2"]
+  local executed, opened, lifecycle = {}, {}, {}
+  local ui2 = {
+    is_enabled = function()
+      return true
+    end,
+    restore = function()
+      table.insert(lifecycle, "restore")
+      return true
+    end,
+    setup = function()
+      table.insert(lifecycle, "setup")
+      return true
+    end,
+  }
 
+  package.loaded["soul.ui.ui2"] = ui2
   vim.fn.execute = function(command)
     table.insert(executed, command)
+    table.insert(lifecycle, "execute")
     return "first message\\nsecond message"
   end
   vim.schedule = function(callback)
@@ -473,6 +489,7 @@ test(":messages opens the shared bordered output float", function()
   end
   messages.open_output = function(title, output, filetype)
     table.insert(opened, { title = title, output = output, filetype = filetype })
+    table.insert(lifecycle, "open")
   end
 
   assert(messages._handle_command("messages"))
@@ -481,11 +498,13 @@ test(":messages opens the shared bordered output float", function()
   assert(opened[1].title == "Messages")
   assert(opened[1].output == "first message\\nsecond message")
   assert(opened[1].filetype == "text")
+  assert(table.concat(lifecycle, ",") == "restore,execute,setup,open")
   assert(not messages._handle_command("messages clear"), ":messages clear must remain native")
 
   vim.fn.execute = original_execute
   vim.schedule = original_schedule
   messages.open_output = original_open_output
+  package.loaded["soul.ui.ui2"] = original_ui2
 end)
 
 test("inspection commands do not intercept highlight mutations", function()
