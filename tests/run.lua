@@ -288,7 +288,8 @@ test("ToggleTerm reuses PowerShell when Git Bash is unavailable", function()
 
   require("soul.plugins.toggleterm")[1].config()
   assert(captured and captured.shell == "powershell.exe")
-  assert(captured.open_mapping == [[<C-\>]])
+  assert(vim.fn.maparg([[<C-\>]], "n") ~= "")
+  assert(vim.fn.maparg([[<C-\>]], "t") ~= "")
 
   vim.fn.has = original_has
   vim.fn.executable = original_executable
