@@ -185,6 +185,19 @@ local function handle_command(command_line)
   local command = parsed.cmd:lower()
   local args = parsed.args or {}
 
+  -- :messages is special under UI2: Neovim sends it to the native pager.
+  -- CVIM keeps inspection output in its own shared bordered float instead.
+  if command == "messages" then
+    if #args > 0 then
+      return false
+    end
+
+    vim.schedule(function()
+      M.show_history()
+    end)
+    return true
+  end
+
   if command == "checkhealth" then
     vim.schedule(function()
       run_health_command(command_line)
@@ -221,6 +234,17 @@ local function handle_command(command_line)
   vim.schedule(function()
     M.open_output(command, result.output)
   end)
+  return true
+end
+
+function M.show_history()
+  local ok, output = pcall(vim.fn.execute, "messages")
+  if not ok then
+    vim.notify(tostring(output), vim.log.levels.ERROR)
+    return false
+  end
+
+  M.open_output("Messages", output, "text")
   return true
 end
 
