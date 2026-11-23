@@ -39,7 +39,9 @@ function M.setup()
   map("n", "<leader>q", "<cmd>confirm qall<CR>", described("Quit Neovim"))
 
   -- Neovim: <leader>n...
-  map("n", "<leader>nm", "<cmd>messages<CR>", described("Message history"))
+  map("n", "<leader>nm", function()
+    require("soul.ui.messages").show_history()
+  end, described("Message history"))
   map("n", "<leader>nc", "<cmd>checkhealth<CR>", described("Check health"))
   map("n", "<leader>nC", function()
     local init = vim.fn.stdpath("config") .. "/init.lua"
