@@ -482,7 +482,7 @@ test(":messages opens the shared bordered output float", function()
   vim.fn.execute = function(command)
     table.insert(executed, command)
     table.insert(lifecycle, "execute")
-    return "first message\\nsecond message"
+    return "first message\nsecond message"
   end
   vim.schedule = function(callback)
     callback()
@@ -496,7 +496,7 @@ test(":messages opens the shared bordered output float", function()
   assert(#executed == 1 and executed[1] == "messages")
   assert(#opened == 1)
   assert(opened[1].title == "Messages")
-  assert(opened[1].output == "first message\\nsecond message")
+  assert(opened[1].output == "first message\nsecond message")
   assert(opened[1].filetype == "text")
   assert(table.concat(lifecycle, ",") == "restore,execute,setup,open")
   assert(not messages._handle_command("messages clear"), ":messages clear must remain native")
