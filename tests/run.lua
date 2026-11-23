@@ -145,6 +145,9 @@ test("Treesitter requests parsers and attaches shell buffers", function()
   package.loaded["nvim-treesitter"] = nil
   package.preload["nvim-treesitter"] = function()
     return {
+      get_installed = function()
+        return { "lua" }
+      end,
       install = function(languages, options)
         requested = {
           languages = languages,
@@ -178,6 +181,7 @@ test("Treesitter requests parsers and attaches shell buffers", function()
 
   assert(requested and requested.options.max_jobs == 2)
   assert(vim.tbl_contains(requested.languages, "c"))
+  assert(not vim.tbl_contains(requested.languages, "lua"), "installed parsers should not be requested again")
   assert(vim.tbl_contains(requested.languages, "bash"))
   assert(vim.tbl_contains(requested.languages, "markdown_inline"))
   assert(type(install_callback) == "function")
@@ -340,6 +344,23 @@ test("UI2 uses native ephemeral messages and restores cleanly", function()
   assert(enabled_options.msg.msg.timeout == 3500)
   assert(enabled_options.msg.msg.height == 0.35)
   assert(enabled_options.msg.pager.height == 0.85)
+  assert(#vim.api.nvim_get_autocmds({ group = "CVIMUI2Borders", event = "FileType" }) == 1)
+
+  local buf = vim.api.nvim_create_buf(false, true)
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = "editor",
+    row = 1,
+    col = 1,
+    width = 20,
+    height = 3,
+    border = "rounded",
+  })
+  vim.bo[buf].filetype = "msg"
+  assert(vim.api.nvim_win_get_config(win).border == "none", "transient messages should not have a border")
+  vim.bo[buf].filetype = "pager"
+  assert(vim.api.nvim_win_get_config(win).border == "rounded", "message history should have a rounded border")
+  vim.api.nvim_win_close(win, true)
+  vim.api.nvim_buf_delete(buf, { force = true })
 
   assert(manager.restore())
   assert(manager.is_enabled() == false)
