@@ -60,14 +60,10 @@ function M.config()
     local restored, restore_error = ui2.restore()
     vim.o.cmdheight = 0
 
-    local message =
-      "tiny-cmdline/UI2 setup failed; using Neovim's native command line.\n"
-      .. tostring(err)
+    local message = "tiny-cmdline/UI2 setup failed; using Neovim's native command line.\n" .. tostring(err)
 
     if not restored then
-      message = message
-        .. "\nUI2 cleanup also failed: "
-        .. tostring(restore_error)
+      message = message .. "\nUI2 cleanup also failed: " .. tostring(restore_error)
     end
 
     vim.notify(message, vim.log.levels.WARN)

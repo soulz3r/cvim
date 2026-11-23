@@ -200,8 +200,10 @@ test("Treesitter requests parsers and attaches shell buffers", function()
 
   started = nil
   install_callback(nil, true)
-  assert(started and started.buf == buf and started.lang == "bash",
-    "buffers opened before parser installation should attach after installation completes")
+  assert(
+    started and started.buf == buf and started.lang == "bash",
+    "buffers opened before parser installation should attach after installation completes"
+  )
 
   vim.treesitter.start = original_start
   vim.treesitter.language.get_lang = original_get_lang

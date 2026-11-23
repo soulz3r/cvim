@@ -125,7 +125,6 @@ function M.setup()
     vim.cmd.cd(vim.fn.fnameescape(root))
   end, described("Change cwd to Git root"))
 
-
   map({ "i", "x" }, ",,", "<Esc>", opts)
   map("n", ",,", "<cmd>nohlsearch<CR>", opts)
 end

@@ -44,7 +44,7 @@ local M = {
             width = 0.60,
             height = 0.60,
             preview_height = 0.45,
-            prompt_position = 'top'
+            prompt_position = "top",
           },
           path_display = { "truncate" },
           mappings = {

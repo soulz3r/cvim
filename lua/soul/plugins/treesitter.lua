@@ -28,8 +28,7 @@ local function attach(buf)
     return
   end
 
-  local lang = filetype_languages[filetype]
-    or vim.treesitter.language.get_lang(filetype)
+  local lang = filetype_languages[filetype] or vim.treesitter.language.get_lang(filetype)
 
   if lang then
     pcall(vim.treesitter.start, buf, lang)
@@ -45,10 +44,7 @@ M.config = function()
   })
 
   if not ok then
-    vim.notify(
-      "Treesitter parser installation could not start: " .. tostring(task),
-      vim.log.levels.ERROR
-    )
+    vim.notify("Treesitter parser installation could not start: " .. tostring(task), vim.log.levels.ERROR)
   elseif task and type(task.await) == "function" then
     task:await(function(err, installed)
       if err then
