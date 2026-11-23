@@ -6,7 +6,7 @@
   "mini.icons": { "branch": "main", "commit": "5d58117d176c133f4cb5585ec8cb3450881c89a0" },
   "mini.pairs": { "branch": "main", "commit": "e332261859814c307e72458222070f84b6d6f4e8" },
   "mini.surround": { "branch": "main", "commit": "77f376bdebb3440ad13bc40b48062b29bccb7577" },
-  "minmax.nvim": { "branch": "main", "commit": "d8f81102c2f8738dfc3860ad6d930bc9e638f3db" },
+  "minmax.nvim": { "branch": "main", "commit": "8e82501dba1c76e5e1de358a1132057091363046" },
   "plenary.nvim": { "branch": "master", "commit": "74b06c6c75e4eeb3108ec01852001636d85a932b" },
   "telescope.nvim": { "branch": "master", "commit": "1e1bab730218eaf97fce743be3f56e51075928ac" },
   "tiny-cmdline.nvim": { "branch": "main", "commit": "ac9c6557c66da6308eb523643df8778f3cbe652f" },
