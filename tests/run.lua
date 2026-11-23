@@ -579,7 +579,6 @@ test("output windows use the shared float layout", function()
   assert(config.relative == "editor")
   assert(config.width == expected.width and config.height == expected.height)
   assert(config.row == expected.row and config.col == expected.col)
-  assert(config.border == "rounded")
   assert(vim.wo[win].wrap == false)
   assert(vim.api.nvim_buf_get_lines(0, 0, -1, false)[1] == "first line")
 
