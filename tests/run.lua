@@ -457,6 +457,37 @@ test("health float interception applies shared geometry and restores API", funct
   vim.notify = original_notify
 end)
 
+test(":messages opens the shared bordered output float", function()
+  local messages = require("soul.ui.messages")
+  local original_execute = vim.fn.execute
+  local original_schedule = vim.schedule
+  local original_open_output = messages.open_output
+  local executed, opened = {}, {}
+
+  vim.fn.execute = function(command)
+    table.insert(executed, command)
+    return "first message\\nsecond message"
+  end
+  vim.schedule = function(callback)
+    callback()
+  end
+  messages.open_output = function(title, output, filetype)
+    table.insert(opened, { title = title, output = output, filetype = filetype })
+  end
+
+  assert(messages._handle_command("messages"))
+  assert(#executed == 1 and executed[1] == "messages")
+  assert(#opened == 1)
+  assert(opened[1].title == "Messages")
+  assert(opened[1].output == "first message\\nsecond message")
+  assert(opened[1].filetype == "text")
+  assert(not messages._handle_command("messages clear"), ":messages clear must remain native")
+
+  vim.fn.execute = original_execute
+  vim.schedule = original_schedule
+  messages.open_output = original_open_output
+end)
+
 test("inspection commands do not intercept highlight mutations", function()
   local messages = require("soul.ui.messages")
   local original_exec2 = vim.api.nvim_exec2
