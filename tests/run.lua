@@ -345,22 +345,38 @@ test("UI2 uses native ephemeral messages and restores cleanly", function()
   assert(enabled_options.msg.msg.height == 0.35)
   assert(enabled_options.msg.pager.height == 0.85)
   assert(#vim.api.nvim_get_autocmds({ group = "CVIMUI2Borders", event = "FileType" }) == 1)
+  assert(#vim.api.nvim_get_autocmds({ group = "CVIMUI2Borders", event = "WinEnter" }) == 1)
 
   local buf = vim.api.nvim_create_buf(false, true)
+  vim.bo[buf].filetype = "msg"
   local win = vim.api.nvim_open_win(buf, true, {
     relative = "editor",
     row = 1,
     col = 1,
     width = 20,
     height = 3,
-    border = "rounded",
+    border = "none",
   })
-  vim.bo[buf].filetype = "msg"
-  assert(vim.api.nvim_win_get_config(win).border == "none", "transient messages should not have a border")
+  assert(vim.api.nvim_win_get_config(win).border == "rounded", "transient messages should use the shared rounded border")
+
   vim.bo[buf].filetype = "pager"
-  assert(vim.api.nvim_win_get_config(win).border == "rounded", "message history should have a rounded border")
+  assert(vim.api.nvim_win_get_config(win).border == "rounded", "message history should use the shared rounded border")
   vim.api.nvim_win_close(win, true)
   vim.api.nvim_buf_delete(buf, { force = true })
+
+  local late_buf = vim.api.nvim_create_buf(false, true)
+  vim.bo[late_buf].filetype = "pager"
+  local late_win = vim.api.nvim_open_win(late_buf, true, {
+    relative = "editor",
+    row = 1,
+    col = 1,
+    width = 20,
+    height = 3,
+    border = "none",
+  })
+  assert(vim.api.nvim_win_get_config(late_win).border == "rounded", "floats attached after FileType should still get the shared border")
+  vim.api.nvim_win_close(late_win, true)
+  vim.api.nvim_buf_delete(late_buf, { force = true })
 
   assert(manager.restore())
   assert(manager.is_enabled() == false)
