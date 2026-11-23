@@ -37,6 +37,16 @@ local M = {
 
       require("telescope").setup({
         defaults = {
+          sorting_strategy = "ascending",
+          layout_strategy = "vertical",
+
+          layout_config = {
+            width = 0.60,
+            height = 0.60,
+            preview_height = 0.45,
+            prompt_position = 'top'
+          },
+          path_display = { "truncate" },
           mappings = {
             n = {
               ["q"] = actions.close,
