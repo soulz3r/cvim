@@ -15,12 +15,12 @@ local function get_ui2()
   return ui2
 end
 
-local function set_window_border(buf, border)
+local function set_window_border(buf)
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf then
       local config = vim.api.nvim_win_get_config(win)
-      if config.relative ~= "" then
-        config.border = border
+      if config.relative ~= "" and config.border ~= "rounded" then
+        config.border = "rounded"
         pcall(vim.api.nvim_win_set_config, win, config)
       end
     end
@@ -30,22 +30,33 @@ end
 local function setup_borders()
   local group = vim.api.nvim_create_augroup("CVIMUI2Borders", { clear = true })
 
+  -- FileType can fire before UI2 attaches its buffer to a float. WinEnter
+  -- catches that later attachment; both message types use the same border.
   vim.api.nvim_create_autocmd("FileType", {
     group = group,
     pattern = { "msg", "pager" },
     callback = function(args)
-      -- UI2 defaults to an unbordered pager and lets msg inherit 'winborder'.
-      -- CVIM uses the opposite: quiet transient messages, bordered history.
-      set_window_border(args.buf, args.match == "pager" and "rounded" or "none")
+      set_window_border(args.buf)
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("WinEnter", {
+    group = group,
+    callback = function()
+      local buf = vim.api.nvim_get_current_buf()
+      local filetype = vim.bo[buf].filetype
+      if filetype == "msg" or filetype == "pager" then
+        set_window_border(buf)
+      end
     end,
   })
 
   local ok, ui2 = pcall(require, "vim._core.ui2")
   if ok and type(ui2) == "table" then
-    for kind, border in pairs({ msg = "none", pager = "rounded" }) do
+    for _, kind in ipairs({ "msg", "pager" }) do
       local buf = ui2.bufs and ui2.bufs[kind]
       if type(buf) == "number" and vim.api.nvim_buf_is_valid(buf) then
-        set_window_border(buf, border)
+        set_window_border(buf)
       end
     end
   end
@@ -89,7 +100,6 @@ function M.setup()
     return false, tostring(enable_error)
   end
 
-  -- UI2 creates its windows while enabling, after the FileType autocmd exists.
   setup_borders()
 
   M.ui2 = ui2
