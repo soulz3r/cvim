@@ -238,7 +238,28 @@ local function handle_command(command_line)
 end
 
 function M.show_history()
+  local ui2 = require("soul.ui.ui2")
+  local restore_ui2 = ui2.is_enabled()
+
+  -- UI2 handles :messages by opening its own pager. Temporarily restore the
+  -- native message renderer so execute() can capture the history as text.
+  if restore_ui2 then
+    local restored, err = ui2.restore()
+    if not restored then
+      vim.notify("Could not prepare message history: " .. tostring(err), vim.log.levels.ERROR)
+      return false
+    end
+  end
+
   local ok, output = pcall(vim.fn.execute, "messages")
+
+  if restore_ui2 then
+    local enabled, err = ui2.setup()
+    if not enabled then
+      vim.notify("Could not restore Neovim UI2: " .. tostring(err), vim.log.levels.ERROR)
+    end
+  end
+
   if not ok then
     vim.notify(tostring(output), vim.log.levels.ERROR)
     return false
