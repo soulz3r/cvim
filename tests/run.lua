@@ -248,6 +248,8 @@ test("ToggleTerm reuses PowerShell when Git Bash is unavailable", function()
   local original_local_app_data = vim.env.LOCALAPPDATA
   local original_preload = package.preload.toggleterm
   local original_loaded = package.loaded.toggleterm
+  local original_terminal_preload = package.preload["toggleterm.terminal"]
+  local original_terminal_loaded = package.loaded["toggleterm.terminal"]
   local captured
 
   vim.fn.has = function(feature)
@@ -264,11 +266,23 @@ test("ToggleTerm reuses PowerShell when Git Bash is unavailable", function()
   vim.env["ProgramFiles(x86)"] = nil
   vim.env.LOCALAPPDATA = nil
   package.loaded.toggleterm = nil
+  package.loaded["toggleterm.terminal"] = nil
   package.preload.toggleterm = function()
     return {
       setup = function(options)
         captured = options
       end,
+    }
+  end
+  package.preload["toggleterm.terminal"] = function()
+    return {
+      Terminal = {
+        new = function()
+          return {
+            toggle = function() end,
+          }
+        end,
+      },
     }
   end
 
@@ -285,6 +299,8 @@ test("ToggleTerm reuses PowerShell when Git Bash is unavailable", function()
   vim.env.LOCALAPPDATA = original_local_app_data
   package.preload.toggleterm = original_preload
   package.loaded.toggleterm = original_loaded
+  package.preload["toggleterm.terminal"] = original_terminal_preload
+  package.loaded["toggleterm.terminal"] = original_terminal_loaded
 end)
 
 test("UI2 uses native ephemeral messages and restores cleanly", function()
