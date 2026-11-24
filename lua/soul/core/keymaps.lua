@@ -53,6 +53,7 @@ function M.setup()
   end, described("Reload init.lua"))
   map("n", "<leader>nv", "<cmd>version<CR>", described("Neovim version"))
   map("n", "<leader>nS", "<cmd>scriptnames<CR>", described("Loaded scripts"))
+  map("n", "<leader>nf", "=G", described("Format document"))
 
   -- Buffers: <leader>b...
   map("n", "<leader>bb", "<cmd>buffers<CR>", described("List buffers"))
