@@ -28,7 +28,8 @@ function M.setup()
   vim.cmd([[set iskeyword+=-]])
   vim.g.netrw_banner = 0
   vim.g.netrw_mouse = 2
-  vim.opt.clipboard = "unnamedplus"
+  -- Keep the unnamed register internal so linewise yanks retain their
+  -- register type. Use the + register explicitly for system clipboard access.
   local platform = require("soul.core.platform")
   local paths = require("soul.core.helpers.paths")
   if platform.is_wsl and paths.wsl_clipboard then
