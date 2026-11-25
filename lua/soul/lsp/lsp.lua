@@ -65,42 +65,6 @@ function M.format_buffer(bufnr)
 	return true
 end
 
-function M.setup_format_on_save(client, bufnr)
-	local formatter = formatter_for(bufnr)
-	if client.name ~= formatter then
-		return
-	end
-
-	if not client:supports_method("textDocument/formatting", bufnr) then
-		return
-	end
-
-	if vim.b[bufnr].soul_format_on_save then
-		return
-	end
-
-	vim.b[bufnr].soul_format_on_save = true
-
-	local group = vim.api.nvim_create_augroup("soul_lsp_format", {
-		clear = false,
-	})
-
-	vim.api.nvim_create_autocmd("BufWritePre", {
-		group = group,
-		buffer = bufnr,
-		callback = function()
-			vim.lsp.buf.format({
-				bufnr = bufnr,
-				async = false,
-				timeout_ms = 3000,
-				filter = function(active_client)
-					return active_client.name == formatter
-						and active_client:supports_method("textDocument/formatting", bufnr)
-				end,
-			})
-		end,
-	})
-end
 
 function M.on_attach(client, bufnr)
 	local navic_ok, navic = pcall(require, "nvim-navic")
@@ -149,7 +113,7 @@ function M.setup_keymaps(bufnr)
 	map("<leader>la", vim.lsp.buf.code_action, "Code Action")
 	map("<leader>lR", vim.lsp.buf.rename, "Rename")
 
-	-- Formatting: only use an attached client that supports it
+	-- Formatting remains available manually; saving never reformats the buffer.
 	map("<leader>lf", function()
 		local ok, err = M.format_buffer(bufnr)
 		if not ok then
@@ -232,7 +196,6 @@ return {
 
 					M.on_attach(client, args.buf)
 					M.setup_keymaps(args.buf)
-					M.setup_format_on_save(client, args.buf)
 				end,
 			})
 

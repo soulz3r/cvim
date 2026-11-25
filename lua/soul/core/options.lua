@@ -14,20 +14,29 @@ vim.opt.pumblend = 10
 vim.opt.showmode = false
 vim.opt.showtabline = 0
 vim.opt.smartcase = true
-vim.opt.smartindent = true
 vim.opt.splitbelow = true
 vim.opt.splitright = true
 vim.opt.splitkeep = "screen"
 vim.opt.swapfile = false
-vim.opt.termguicolors = true
+vim.opt.termguicolors = false
 vim.opt.timeoutlen = 500
 vim.opt.undofile = true
 vim.opt.updatetime = 100
 vim.opt.writebackup = false
 
-vim.opt.expandtab = true
-vim.opt.shiftwidth = 2
-vim.opt.tabstop = 2
+-- Keep Vim's native indentation behavior. No automatic indentation or
+-- whitespace conversion is applied while editing.
+vim.opt.autoindent = false
+vim.opt.smartindent = false
+vim.opt.cindent = false
+vim.opt.indentexpr = ""
+vim.opt.expandtab = false
+vim.opt.shiftwidth = 0
+vim.opt.softtabstop = 0
+vim.opt.tabstop = 8
+
+vim.cmd("filetype indent off")
+vim.cmd("syntax enable")
 
 vim.opt.cursorline = true
 vim.opt.number = true

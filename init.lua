@@ -27,7 +27,7 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 if vim.fn.has("nvim-0.12") ~= 1 then
-	error("soulz3r/nvim requires Neovim 0.12 or newer")
+	error("soulz3r/cvim requires Neovim 0.12 or newer")
 end
 
 require("soul.launch")
@@ -62,7 +62,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
 require("soul.core.neovide")
 
 -- Load spec modules directly and pass their returned tables to Lazy.
--- This avoids Lazy's directory discovery and loadfile-based import pass.
+-- Keep the UI and workflow plugins; use Vim's built-in syntax and terminal colors.
 GET("soul.plugins.alpha")
 GET("soul.plugins.breadcrumbs")
 GET("soul.plugins.devicons")
@@ -72,13 +72,11 @@ GET("soul.plugins.mini")
 GET("soul.plugins.render_md")
 GET("soul.plugins.telescope")
 GET("soul.plugins.toggleterm")
-GET("soul.plugins.treesitter")
 GET("soul.plugins.undotree")
 GET("soul.plugins.whichkey")
 GET("soul.plugins.yap")
 
 GET("soul.extras.colorizer")
-GET("soul.extras.everforest")
 GET("soul.extras.eyeliner")
 GET("soul.extras.tiny_cmdline")
 GET("soul.extras.todo")
@@ -90,8 +88,6 @@ GET("soul.cmp.blink")
 
 require("soul.lazy")
 
--- Apply CVIM highlights after Everforest has set the base colorscheme.
-require("soul.core.helpers.ui")
 
 -- Used by the repository benchmark to verify this checkout actually loaded.
 vim.g.cvim_config_loaded = true
