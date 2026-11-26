@@ -1,3 +1,6 @@
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 vim.opt.backup = false
 -- Native command line stays available unless the optional UI2 frontend loads.
 vim.opt.cmdheight = 1
@@ -80,9 +83,6 @@ vim.opt.winborder = "rounded"
 
 vim.cmd("set whichwrap+=<,>,[,],h,l")
 vim.cmd([[set iskeyword+=-]])
-
-vim.g.netrw_banner = 0
-vim.g.netrw_mouse = 2
 
 vim.opt.clipboard = "unnamedplus"
 
