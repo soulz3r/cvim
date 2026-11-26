@@ -124,6 +124,8 @@ vim.env.PWSH = original_pwsh
 package.loaded[paths_module] = original_paths
 
 require("soul.core.options")
+assert(vim.g.loaded_netrw == 1, "Built-in netrw must be disabled")
+assert(vim.g.loaded_netrwPlugin == 1, "Built-in netrw plugin commands must be disabled")
 assert(
 	package.loaded["soul.core.helpers.ui.floats"] == nil,
 	"Core options must not eagerly load the optional floating UI helper"
